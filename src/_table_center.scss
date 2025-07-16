@@ -1,0 +1,29 @@
+#table-center {
+    display: flex;
+    justify-content: center;
+    align-items: center; 
+    flex-direction: column;
+    gap: 20px;
+    padding: 5px; 
+    min-width: 790px;
+
+    #table-rows {
+        display: grid;
+        grid-template-columns: auto auto auto 81px;
+        gap: 20px;
+        align-items: center;
+
+        .discard-space {
+            width: 143px;
+            height: 200px;
+        }
+
+        .giant-table-cards {
+            width: 445px;
+        }
+
+        &.hidden {
+            display: none;
+        }
+    }
+}

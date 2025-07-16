@@ -1,0 +1,29 @@
+@use '../node_modules/bga-zoom/bga-zoom';
+@use '../node_modules/bga-help/bga-help';
+@use '../node_modules/bga-cards/bga-cards';
+@use './_cards';
+@use './_city_table_center';
+@use './_giant_table_center';
+@use './_heroe_table_center';
+@use './_table_center';
+@use 'sass:math';
+
+#full-table {
+    position: relative;
+  
+    #centered-table {
+      display: flex;
+      justify-content: center;
+      flex-direction: column;
+    }
+  
+    #tables {
+      position: relative;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 20px;
+    }
+  }
+  

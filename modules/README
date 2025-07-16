@@ -1,0 +1,43 @@
+This directory is meant to hold PHP / js files for inclusion in your
+<gamename>.game.php / gamename.js if needed.
+
+It is recommended to name your files starting with a trigram of your game name.
+For example if you have a class to manage pathfinding in the game
+Tobago, it will be called TBGPathFinding.php (and the class inside be
+called TBGPathFinding) to avoid potential namespace collisions.
+
+--giant-cards
+
+
+centered-table          flex
+-giant-table-center      flex
+--giant-table-rows        grid
+---giant-table-cards           width
+---giant-card-1
+----card-sides
+-----giant-card-1-front
+------zonas
+-----giant-card-1-back
+---...
+---giant-card-9
+
+-heroe-table-center
+--heroe-cards
+---heroe-card-1
+---heroe-card-2
+---heroe-card-3
+
+-city-table-center
+--city-cards
+---city-card-1
+---city-card-2
+
+------------------------------
+
+centered-table       flex
+-table-center       flex
+--table-rows      grid
+---table-cards-1   width
+----card-1        relative
+----card-2
+----card-3

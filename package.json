@@ -1,0 +1,26 @@
+{
+  "name": "amenazagigante",
+  "version": "1.0.0",
+  "description": "",
+  "main": "amenazagigante.js",
+  "scripts": {
+    "build:ts": "tsc",
+    "build:scss": "sass --no-source-map src/amenazagigante.scss amenazagigante.css",
+    "watch:ts": "tsc --watch",
+    "watch:scss": "sass --watch src/amenazagigante.scss amenazagigante.css",
+    "watch": "npm run watch:ts & npm run watch:scss",
+    "build": "npm run build:ts & npm run build:scss"
+  },
+  "author": "Sebastian Otero",
+  "license": "ISC",
+  "dependencies": {
+    "bga-animations": "thoun/bga-animations#1.1.1",
+    "bga-cards": "thoun/bga-cards#3.1.5",
+    "bga-help": "thoun/bga-help#1.0.0",
+    "bga-zoom": "thoun/bga-zoom#1.0.4"
+  },
+  "devDependencies": {
+    "sass": "^1.71.0",
+    "typescript": "^5.3.3"
+  }
+}

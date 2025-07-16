@@ -1,0 +1,402 @@
+objeto que recibe el front de cartas
+
+GET ALL DATA
+tableCards = {
+    "1": [
+        {
+            "cost": 6,
+            "messenger": false,
+            "name": "Alchemist",
+            "shields": {
+                "3": 1
+            },
+            "abilities": [
+                {
+                    "reward": {
+                        "type": 4,
+                        "quantity": 12
+                    },
+                    "type": null,
+                    "condition": null,
+                    "conditionArg": null,
+                    "for": null
+                }
+            ],
+            "scoring": {
+                "reward": {
+                    "type": 1,
+                    "quantity": 4
+                },
+                "type": 3,
+                "condition": 60,
+                "conditionArg": null,
+                "for": null
+            },
+            "maxPurse": null,
+            "chooseAbility": false,
+            "id": 19,
+            "location": "table1",
+            "locationArg": 0,
+            "type": 1,
+            "index": 22,
+            "x": 0,
+            "y": 0,
+            "flipped": false,
+            "gold": 0
+        },
+        {
+            "cost": 3,
+            "messenger": false,
+            "name": "Queen Mother",
+            "shields": {
+                "1": 2
+            },
+            "abilities": [
+                {
+                    "reward": {
+                        "type": 2,
+                        "quantity": 2
+                    },
+                    "type": null,
+                    "condition": null,
+                    "conditionArg": null,
+                    "for": 20
+                }
+            ],
+            "scoring": {
+                "reward": {
+                    "type": 1,
+                    "quantity": 2
+                },
+                "type": 3,
+                "condition": 30,
+                "conditionArg": null,
+                "for": null
+            },
+            "maxPurse": 5,
+            "chooseAbility": false,
+            "id": 32,
+            "location": "table1",
+            "locationArg": 0,
+            "type": 1,
+            "index": 6,
+            "x": 0,
+            "y": 0,
+            "flipped": false,
+            "gold": 0
+        },
+        {
+            "cost": 5,
+            "messenger": true,
+            "name": "Chaplain",
+            "shields": {
+                "2": 1
+            },
+            "abilities": [
+                {
+                    "reward": {
+                        "type": 2,
+                        "quantity": 1
+                    },
+                    "type": 3,
+                    "condition": 90,
+                    "conditionArg": 1,
+                    "for": null
+                }
+            ],
+            "scoring": {
+                "reward": {
+                    "type": 1,
+                    "quantity": 2
+                },
+                "type": 3,
+                "condition": 50,
+                "conditionArg": 2,
+                "for": null
+            },
+            "maxPurse": null,
+            "chooseAbility": false,
+            "id": 37,
+            "location": "table1",
+            "locationArg": 0,
+            "type": 1,
+            "index": 16,
+            "x": 0,
+            "y": 0,
+            "flipped": false,
+            "gold": 0
+        }
+    ],
+    "2": [
+        {
+            "cost": 4,
+            "messenger": true,
+            "name": "Revolutionary",
+            "shields": {
+                "6": 1
+            },
+            "abilities": [
+                {
+                    "reward": {
+                        "type": 3,
+                        "quantity": 1
+                    },
+                    "type": 3,
+                    "condition": 50,
+                    "conditionArg": 2,
+                    "for": null
+                }
+            ],
+            "scoring": {
+                "reward": {
+                    "type": 1,
+                    "quantity": 9
+                },
+                "type": 2,
+                "condition": 20,
+                "conditionArg": 1,
+                "for": null
+            },
+            "maxPurse": null,
+            "chooseAbility": false,
+            "id": 47,
+            "location": "table2",
+            "locationArg": 0,
+            "type": 2,
+            "index": 37,
+            "x": 0,
+            "y": 0,
+            "flipped": false,
+            "gold": 0
+        },
+        {
+            "cost": 4,
+            "messenger": true,
+            "name": "Witch",
+            "shields": {
+                "6": 1
+            },
+            "abilities": [
+                {
+                    "reward": {
+                        "type": 2,
+                        "quantity": 1
+                    },
+                    "type": 3,
+                    "condition": 20,
+                    "conditionArg": 6,
+                    "for": null
+                },
+                {
+                    "reward": {
+                        "type": 3,
+                        "quantity": 1
+                    },
+                    "type": 3,
+                    "condition": 24,
+                    "conditionArg": 2,
+                    "for": null
+                }
+            ],
+            "scoring": {
+                "reward": {
+                    "type": 1,
+                    "quantity": 9
+                },
+                "type": 2,
+                "condition": 20,
+                "conditionArg": 2,
+                "for": null
+            },
+            "maxPurse": null,
+            "chooseAbility": false,
+            "id": 72,
+            "location": "table2",
+            "locationArg": 0,
+            "type": 2,
+            "index": 27,
+            "x": 0,
+            "y": 0,
+            "flipped": false,
+            "gold": 0
+        },
+        {
+            "cost": 0,
+            "messenger": false,
+            "name": "Innkeeper",
+            "shields": {
+                "5": 1
+            },
+            "abilities": [
+                {
+                    "reward": {
+                        "type": 2,
+                        "quantity": 2
+                    },
+                    "type": null,
+                    "condition": null,
+                    "conditionArg": null,
+                    "for": 20
+                },
+                {
+                    "reward": {
+                        "type": 2,
+                        "quantity": 2
+                    },
+                    "type": null,
+                    "condition": null,
+                    "conditionArg": null,
+                    "for": 10
+                }
+            ],
+            "scoring": {
+                "reward": {
+                    "type": 1,
+                    "quantity": 2
+                },
+                "type": 3,
+                "condition": 30,
+                "conditionArg": null,
+                "for": null
+            },
+            "maxPurse": 6,
+            "chooseAbility": false,
+            "id": 74,
+            "location": "table2",
+            "locationArg": 0,
+            "type": 2,
+            "index": 21,
+            "x": 0,
+            "y": 0,
+            "flipped": false,
+            "gold": 0
+        }
+    ]
+}
+
+ARGS
+tableCards = [
+    {
+        "cost": 6,
+        "messenger": false,
+        "name": "Alchemist",
+        "shields": {
+            "3": 1
+        },
+        "abilities": [
+            {
+                "reward": {
+                    "type": 4,
+                    "quantity": 12
+                },
+                "type": null,
+                "condition": null,
+                "conditionArg": null,
+                "for": null
+            }
+        ],
+        "scoring": {
+            "reward": {
+                "type": 1,
+                "quantity": 4
+            },
+            "type": 3,
+            "condition": 60,
+            "conditionArg": null,
+            "for": null
+        },
+        "maxPurse": null,
+        "chooseAbility": false,
+        "id": 19,
+        "location": "table1",
+        "locationArg": 0,
+        "type": 1,
+        "index": 22,
+        "x": 0,
+        "y": 0,
+        "flipped": false,
+        "gold": 0
+    },
+    {
+        "cost": 3,
+        "messenger": false,
+        "name": "Queen Mother",
+        "shields": {
+            "1": 2
+        },
+        "abilities": [
+            {
+                "reward": {
+                    "type": 2,
+                    "quantity": 2
+                },
+                "type": null,
+                "condition": null,
+                "conditionArg": null,
+                "for": 20
+            }
+        ],
+        "scoring": {
+            "reward": {
+                "type": 1,
+                "quantity": 2
+            },
+            "type": 3,
+            "condition": 30,
+            "conditionArg": null,
+            "for": null
+        },
+        "maxPurse": 5,
+        "chooseAbility": false,
+        "id": 32,
+        "location": "table1",
+        "locationArg": 0,
+        "type": 1,
+        "index": 6,
+        "x": 0,
+        "y": 0,
+        "flipped": false,
+        "gold": 0
+    },
+    {
+        "cost": 5,
+        "messenger": true,
+        "name": "Chaplain",
+        "shields": {
+            "2": 1
+        },
+        "abilities": [
+            {
+                "reward": {
+                    "type": 2,
+                    "quantity": 1
+                },
+                "type": 3,
+                "condition": 90,
+                "conditionArg": 1,
+                "for": null
+            }
+        ],
+        "scoring": {
+            "reward": {
+                "type": 1,
+                "quantity": 2
+            },
+            "type": 3,
+            "condition": 50,
+            "conditionArg": 2,
+            "for": null
+        },
+        "maxPurse": null,
+        "chooseAbility": false,
+        "id": 37,
+        "location": "table1",
+        "locationArg": 0,
+        "type": 1,
+        "index": 16,
+        "x": 0,
+        "y": 0,
+        "flipped": false,
+        "gold": 0
+    }
+]

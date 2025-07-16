@@ -1,0 +1,53 @@
+#giant-table-center {
+    display: flex;
+    justify-content: center;
+    align-items: center; 
+    flex-direction: column;
+    gap: 20px;
+    padding: 5px; 
+    min-width: 790px;
+
+    #giant-table-row {
+        background: #FFFFFF66;
+        padding: 15px;
+        border-radius: 15px;
+
+        .name-wrapper {
+            position: relative;
+            display: flex;
+            padding: 5px;
+            justify-content: center;
+            align-items: center;
+        
+            .name {
+              font-size: 20pt;
+              font-weight: bold;
+              font-family: 'Vinque-Regular';
+              text-shadow: 0 0 1px white, 0 0 2px white, 0 0 3px white;
+        
+              &[data-color="FFFFFF"], &[data-color="ffffff"] {
+                text-shadow: 0 0 1px black, 0 0 2px black, 0 0 3px black;
+              }
+            }
+          }
+
+        // .giant-table-cards {
+        //     display: grid;
+        //     grid-template-columns: auto auto auto auto auto auto auto auto auto;
+        //     gap: 20px;
+        //     align-items: center;
+        //     // width: 445px;
+        // }
+
+        .giant-table-cards {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 20px;
+          }
+
+        &.hidden {
+            display: none;
+        }
+    }
+}

@@ -1,0 +1,381 @@
+@use "sass:math";
+
+.card {
+  position: relative;
+  width: 186px; //186px; 93
+  height: 260px; //260px; 130
+  border-radius: 10px;
+
+  .card-sides {
+    .card-side {
+      border-radius: 10px;
+      background-size: auto 300%; // columns, row
+      background-image: url("img/cards.png");
+
+      & > * {
+        // pointer-events: none;
+        user-select: none;
+      }
+
+      &.front {
+        font-family: "Vinque-Regular";
+
+        .name {
+          position: absolute;
+          top: 110px;
+          left: 14px;
+          transform-origin: top left;
+          transform: rotate(-90deg);
+          font-size: 10px;
+          overflow: hidden;
+          white-space: nowrap;
+
+          width: 72px;
+        }
+      }
+    }
+  }
+
+  &[data-type="1"] .back {
+    background-position: 0% 100%;
+  }
+  &[data-type="2"] .back {
+    background-position: 0% 100%;
+  }
+
+  &.bga-cards_selectable-card:not(.bga-cards_disabled-card) {
+    &:not(.bga-cards_selected-card) {
+      animation: selectable-card-animation 1s alternate infinite ease-in-out;
+    }
+
+    .card-side {
+      box-shadow: unset;
+    }
+  }
+
+  &.bga-cards_selected-card:not(.bga-cards_disabled-card) {
+    box-shadow: 0 0 5px 8px green;
+
+    .card-side {
+      box-shadow: unset;
+    }
+  }
+}
+
+@keyframes selectable-card-animation {
+  0% {
+    //background: var(--background-lighter);
+    box-shadow: 0 0 3px 2px #ffffff;
+  }
+  100% {
+    //background: var(--background-darker);
+    box-shadow: 0 0 5px 3px #ffffff;
+  }
+}
+
+.card-section {
+  height: 33.33%;
+  width: 100%;
+  position: relative;
+
+  .giant-action-area {
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    border-radius: 5px;
+    // background-color: rgba(169, 169, 169, 0.342);
+
+      &.highlighted-action {
+        background-color: rgb(169, 169, 169);
+        border: 3px solid red;
+        border-radius: 5px;
+        cursor:pointer;
+        opacity: 0.5;
+        z-index: 9;
+        pointer-events: auto;
+      }
+  }
+
+  &.top {
+/*1 solo arriba largo 
+    G1 G2 G3 G5 G6 G7 G8 G9*/
+    .pos-1 {
+      /* top: 11%; */
+      top: 9%;
+      left: 10%;
+      width: 79%;
+      height: 38%;
+    }
+  
+    /* abajo dividido en 2 lado izquierda */
+    .pos-2 {
+      top: 52.5%;
+      left: 10%;
+      width: 38%;
+      height: 38%;
+    }
+  
+    /* G6 */
+    .pos-21 {
+      top: 53.5%;
+      left: 10%;
+      width: 40%;
+      height: 38%;
+    }
+  
+    /* G3 */
+    .pos-22 {
+      top: 53.5%;
+      left: 10%;
+      width: 33%;
+      height: 38%;
+    }
+  
+    /* abajo dividido en 2 lado derecho 
+    G1 G2 G7 G9*/
+    .pos-3 {
+      top: 53%;
+      left: 51%;
+      width: 38%;
+      height: 38%;
+    }
+  
+    /* G6 */
+    .pos-31 {
+      top: 53%;
+      left: 53%;
+      width: 36%;
+      height: 38%;
+    }
+  
+    /* G3 */
+    .pos-32 {
+      top: 53%;
+      left: 46%;
+      width: 42%;
+      height: 38%;
+    }
+  
+    /* central dividido en 2 lado izquierdo */
+    .pos-4 {
+      top: 30%;
+      left: 10%;
+      width: 37%;
+      height: 37%;
+    }
+  
+    /* central dividido en 2 lado derecho */
+    .pos-5 {
+      top: 30%;
+      left: 50%;
+      width: 40%;
+      height: 38%;
+    }
+  
+    /* central unico */
+    .pos-6 {
+      top: 28%;
+      left: 10%;
+      width: 79%;
+      height: 38%;
+    }
+  
+    /* abajo dividido en 3 lado izquierda 
+    G8 */
+    .pos-7 {
+      top: 53%;
+      left: 11%;
+      width: 24%;
+      height: 38%;
+    }
+  
+    /* abajo dividido en 3 central */
+    .pos-8 {
+      top: 55%;
+      left: 38%;
+      width: 24%;
+      height: 38%;
+    }
+  
+    /* abajo dividido en 3 lado derecho */
+    .pos-9 {
+      top: 55%;
+      left: 64%;
+      width: 25%;
+      height: 38%;
+    }
+  }
+ 
+  /* ----------------------------------------------------------------------------------- */
+  &.middle {
+    .pos-1 {
+      /* top: 11%; */
+      top: 7%;
+      left: 10%;
+      width: 79%;
+      height: 38%;
+    }
+  
+    .pos-2 {
+      top: 52.5%;
+      left: 10%;
+      width: 38%;
+      height: 38%;
+    }
+  
+    .pos-22 {
+      top: 51.5%;
+      left: 10%;
+      width: 46%;
+      height: 38%;
+    }
+  
+    .pos-23 {
+      top: 52.5%;
+      left: 10%;
+      width: 36%;
+      height: 38%;
+    }
+  
+    .pos-3 {
+      top: 53%;
+      left: 51%;
+      width: 38%;
+      height: 36%;
+    }
+  
+    .pos-31 {
+      top: 53%;
+      left: 58%;
+      width: 31%;
+      height: 36%;
+    }
+  
+    .pos-32 {
+      top: 53%;
+      left: 47%;
+      width: 42%;
+      height: 36%;
+    }
+  
+    .pos-4 {
+      top: 29%;
+      left: 10%;
+      width: 79%;
+      height: 38%;
+    }
+  
+    .pos-5 {
+      top: 52%;
+      left: 10%;
+      width: 79%;
+      height: 37%;
+    }
+  
+    .pos-6 {
+      top: 7.5%;
+      left: 10%;
+      width: 36%;
+      height: 38%;
+    }
+  
+    .pos-61 {
+      top: 7.5%;
+      left: 10%;
+      width: 27%;
+      height: 38%;
+    }
+  
+    .pos-7 {
+      top: 7.5%;
+      left: 47%;
+      width: 42%;
+      height: 36%;
+    }
+  
+    .pos-71 {
+      top: 7.5%;
+      left: 39%;
+      width: 50%;
+      height: 36%;
+    }
+  }
+
+  &.bottom {
+    /* .pos-4 {
+      bottom: 5px;
+      left: 50%;
+      transform: translateX(-50%);
+    } */
+  
+    .pos-111 {
+      top: 27.5%;
+      left: 10%;
+      width: 77%;
+      height: 37%;
+    }
+
+    .pos-500 {
+      top: 5.5%;
+      left: 10%;
+      width: 77%;
+      height: 37%;
+    }
+
+    .pos-501 {
+      top: 50.5%;
+      left: 10%;
+      width: 42%;
+      height: 34%;
+    }
+
+    .pos-502 {
+      top: 50.5%;
+      left: 57%;
+      width: 30%;
+      height: 34%;
+    }
+
+    .pos-701 {
+      top: 47.5%;
+      left: 10%;
+      width: 37%;
+      height: 36%;
+    }
+
+    .pos-702 {
+      top: 47.5%;
+      left: 50%;
+      width: 37%;
+      height: 36%;
+    }
+
+    .pos-300 {
+      top: 4.5%;
+      left: 10%;
+      width: 29%;
+      height: 35%;
+    }
+
+    .pos-301 {
+      top: 4.5%;
+      left: 44%;
+      width: 43%;
+      height: 35%;
+    }
+
+    .pos-302 {
+      top: 49.5%;
+      left: 10%;
+      width: 36%;
+      height: 35%;
+    }
+
+    .pos-303 {
+      top: 49.5%;
+      left: 51%;
+      width: 35%;
+      height: 35%;
+    }
+  }
+}

@@ -1,0 +1,229 @@
+#city-table-center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  gap: 20px;
+  padding: 5px;
+  min-width: 790px;
+
+  #city-table-row {
+    background: #ffffff66;
+    padding: 15px;
+    border-radius: 15px;
+
+    .name-wrapper {
+      position: relative;
+      display: flex;
+      padding: 5px;
+      justify-content: center;
+      align-items: center;
+
+      .name {
+        font-size: 20pt;
+        font-weight: bold;
+        font-family: "Vinque-Regular";
+        text-shadow: 0 0 1px white, 0 0 2px white, 0 0 3px white;
+
+        &[data-color="FFFFFF"],
+        &[data-color="ffffff"] {
+          text-shadow: 0 0 1px black, 0 0 2px black, 0 0 3px black;
+        }
+      }
+    }
+
+    .city-table-cards {
+      display: flex;
+      justify-content: center;
+      height: 350px;
+
+      .city-card {
+        background-image: url("img/city.png");
+        aspect-ratio: 2680 / 1045;
+        border: 1px solid black;
+        background-size: cover;
+        border-radius: 10px;
+        position: relative;
+      }
+    }
+  }
+}
+
+.nut {
+  background-image: url("img/nutToken.png");
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  /* border: 3px solid black; */
+  background-size: cover;
+  /* position: absolute; */
+  border-radius: 40px;
+
+  .available {
+    z-index: 10;
+    pointer-events: auto;
+  }
+}
+
+.track-token {
+  background-image: url("img/tokens.png");
+  width: 100%;
+  /* width: 45px; */
+  aspect-ratio: 1 / 1;
+  border: 3px solid black;
+  background-size: cover;
+  border-radius: 40px;
+  z-index: 10;
+}
+
+.giant-life {
+    /* width: 45px;
+    height: 45px; */
+    width: 5.5%;
+    height: 14.9%;
+    /* background-color: #d8d6d6; */
+    border: 1px solid black;
+    border-radius: 90px;
+    /* opacity: 0.4; */
+    position: absolute;
+    top: 2.0%;
+    /* left: 40%; */
+  }
+  
+  .giant-life.life1 { left: 0.7%; }
+  .giant-life.life2 { left: 10.4%; }
+  .giant-life.life3 { left: 20.4%; }
+  .giant-life.life4 { left: 30.7%; }
+  .giant-life.life5 { left: 40.8%; }
+  .giant-life.life6 { left: 50.9%; }
+  .giant-life.life7 { left: 61.0%; }
+  .giant-life.life8 { left: 71.2%; }
+  .giant-life.life9 { left: 81.3%; }
+  .giant-life.life10 { left: 92.0%; }
+  
+  .quality-attack-track {
+    width: 5.5%;
+    height: 14.9%;
+    /* background-color: #d8d6d6;
+    border: 1px solid black; */
+    border-radius: 90px;
+    /* opacity: 0.4; */
+    position: absolute;
+    top: 21.5%
+  }
+  
+  .quality-attack-track.attack0 { left: 4.5%; }
+  .quality-attack-track.attack1 { left: 10.4%; }
+  .quality-attack-track.attack2 { left: 16.4%; }
+  .quality-attack-track.attack3 { left: 22.2%; }
+  .quality-attack-track.attack4 { left: 28.2%; }
+  .quality-attack-track.attack5 { left: 34.2%; }
+  
+  .quality-repair-track {
+    width: 5.5%;
+    height: 14.9%;
+    /* background-color: #d8d6d6;
+    border: 1px solid black; */
+    border-radius: 90px;
+    /* opacity: 0.4; */
+    position: absolute;
+    top: 43.0%
+  }
+  
+  .quality-repair-track.repair0 { left: 1.5%; }
+  .quality-repair-track.repair1 { left: 7.4%; }
+  .quality-repair-track.repair2 { left: 13.4%; }
+  .quality-repair-track.repair3 { left: 19.2%; }
+  .quality-repair-track.repair4 { left: 25.2%; }
+  .quality-repair-track.repair5 { left: 31.2%; }
+  
+  .quality-moral-track {
+    width: 5.5%;
+    height: 14.9%;
+    /* background-color: #d8d6d6;
+    border: 1px solid black; */
+    border-radius: 90px;
+    /* opacity: 0.4; */
+    position: absolute;
+    top: 63.3%
+  }
+  
+  .quality-moral-track.moral0 { left: 0.5%; }
+  .quality-moral-track.moral1 { left: 7.2%; }
+  .quality-moral-track.moral2 { left: 14.2%; }
+  .quality-moral-track.moral3 { left: 21.0%; }
+  .quality-moral-track.moral4 { left: 27.9%; }
+  .quality-moral-track.moral5 { left: 35.0%; }
+  
+  
+  .supply-ammo-track {
+    width: 5.5%;
+    height: 14.9%;
+    /* background-color: #d8d6d6;
+    border: 1px solid black; */
+    border-radius: 90px;
+    /* opacity: 0.4; */
+    position: absolute;
+    top: 21.9%
+  }
+  
+  .supply-ammo-track.ammo0 { left: 60.0%; }
+  .supply-ammo-track.ammo1 { left: 65.8%; }
+  .supply-ammo-track.ammo2 { left: 71.6%; }
+  .supply-ammo-track.ammo3 { left: 77.5%; }
+  .supply-ammo-track.ammo4 { left: 83.2%; }
+  
+  .supply-tools-track {
+    width: 5.5%;
+    height: 14.9%;
+    /* background-color: #d8d6d6;
+    border: 1px solid black; */
+    border-radius: 90px;
+    /* opacity: 0.4; */
+    position: absolute;
+    top: 43.2%
+  }
+  
+  .supply-tools-track.tools0 { left: 62.9%; }
+  .supply-tools-track.tools1 { left: 68.8%; }
+  .supply-tools-track.tools2 { left: 74.6%; }
+  .supply-tools-track.tools3 { left: 80.5%; }
+  .supply-tools-track.tools4 { left: 86.2%; }
+  
+  .supply-trumpet-track {
+    width: 5.5%;
+    height: 14.9%;
+    /* background-color: #d8d6d6;
+    border: 1px solid black; */
+    border-radius: 90px;
+    /* opacity: 0.4; */
+    position: absolute;
+    top: 64.2%
+  }
+  
+  .supply-trumpet-track.trumpet0 { left: 59.3%; }
+  .supply-trumpet-track.trumpet1 { left: 65.2%; }
+  .supply-trumpet-track.trumpet2 { left: 71.1%; }
+  .supply-trumpet-track.trumpet3 { left: 76.8%; }
+  .supply-trumpet-track.trumpet4 { left: 82.6%; }
+  
+  .city-destruction-track {
+    width: 5.5%;
+    height: 14.9%;
+    /* background-color: #d8d6d6;
+    border: 1px solid black; */
+    border-radius: 90px;
+    /* opacity: 0.4; */
+    position: absolute;
+    top: 83%;
+  }
+  
+  .city-destruction-track.destruction1 { left: 2.0%; }
+  .city-destruction-track.destruction2 { left: 10.3%; }
+  .city-destruction-track.destruction3 { left: 20.4%; }
+  .city-destruction-track.destruction4 { left: 30.6%; }
+  .city-destruction-track.destruction5 { left: 40.8%; }
+  .city-destruction-track.destruction6 { left: 51.0%; }
+  .city-destruction-track.destruction7 { left: 61.0%; }
+  .city-destruction-track.destruction8 { left: 70.9%; }
+  .city-destruction-track.destruction9 { left: 81.0%; }
+  .city-destruction-track.destruction10 { left: 91.9%; }
