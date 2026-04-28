@@ -99,6 +99,120 @@
         //   }
         // }
 
+// Hero Selection UI
+#hero-selection-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  padding: 20px;
+
+  .hero-selection-title {
+    font-size: 18pt;
+    font-weight: bold;
+    color: #333;
+    text-align: center;
+  }
+
+  .hero-cards-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 15px;
+    max-width: 800px;
+  }
+
+  .hero-card-select {
+    width: 120px;
+    height: 160px;
+    border: 3px solid #ccc;
+    border-radius: 8px;
+    cursor: pointer;
+    position: relative;
+    transition: transform 0.2s, border-color 0.2s;
+    background: #fff;
+
+    &:hover {
+      transform: translateY(-5px);
+      border-color: #999;
+    }
+
+    &.selected {
+      border-color: #3aa1ff;
+      transform: translateY(-5px);
+      box-shadow: 0 4px 12px rgba(58, 161, 255, 0.4);
+
+      .hero-card-check {
+        display: block;
+      }
+    }
+
+    .hero-card-image {
+      width: 100%;
+      height: 120px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+
+      img {
+        max-width: 100%;
+        max-height: 100%;
+        object-fit: contain;
+      }
+    }
+
+    .hero-card-type {
+      position: absolute;
+      top: 5px;
+      right: 5px;
+      background: #333;
+      color: #fff;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-weight: bold;
+      font-size: 12px;
+    }
+
+    .hero-card-check {
+      display: none;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 40px;
+      color: #3aa1ff;
+      text-shadow: 0 0 5px white;
+    }
+  }
+
+  .hero-selection-info {
+    font-size: 16px;
+    color: #666;
+  }
+
+  #confirm-hero-selection {
+    padding: 12px 30px;
+    font-size: 16px;
+    font-weight: bold;
+    background: #3aa1ff;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.2s;
+
+    &:hover:not(:disabled) {
+      background: #2880e0;
+    }
+
+    &:disabled {
+      background: #ccc;
+      cursor: not-allowed;
+    }
+  }
+}
+
         &.hidden {
             display: none;
         }

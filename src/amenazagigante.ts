@@ -2,12 +2,12 @@ const LOCAL_STORAGE_ZOOM_KEY = "AmenazaGigante-zoom";
 
 // @ts-ignore
 const gameState = {
-  heroSelection: "heroSelection",
-  initGiantTurn: "initGiantTurn",
-  giantMandatoryMove: "giantMandatoryMove",
-  giantPlayerChoice: "giantPlayerChoice",
-  giantSpecialAction: "giantSpecialAction",
-  heroPhase: "heroPhase"
+  playerSelectHeroes: "playerSelectHeroes",
+  giantAdvance: "giantAdvance",
+  giantResolution: "giantResolution",
+  heroesDistribution: "heroesDistribution",
+  heroesActions: "heroesActions",
+  cityVerification: "cityVerification"
 };
 
 const actName = {
@@ -88,7 +88,7 @@ class AmenazaGigante extends GameGui<AmenazaGiganteGamedatas> implements Amenaza
     this.giantManager = new GiantManager(giantPosition, giantArea, giantCards, this);
     this.giantManager.setupGiant();
 
-    if (this.currentGameState === gameState.heroSelection) {
+    if (this.currentGameState === gameState.playerSelectHeroes) {
       console.log("Entering hero selection state SETUP");
 
       document.getElementById("heroe-table-center").dataset.visible = "false";
@@ -125,25 +125,24 @@ class AmenazaGigante extends GameGui<AmenazaGiganteGamedatas> implements Amenaza
     console.log("Entering state: " + stateName, args.args);
 
     switch (stateName) {
-      case gameState.heroSelection:
-        console.log("Entering heroSelection state: Do nothing");
+      case gameState.playerSelectHeroes:
+        console.log("Entering playerSelectHeroes state: Do nothing");
         break;
-      case gameState.initGiantTurn:
-        console.log("Entering initGiantTurn state: Do nothing");
+      case gameState.giantAdvance:
+        console.log("Entering giantAdvance state: Do nothing");
         break;
-      case gameState.giantMandatoryMove:
-        console.log("Entering giantMandatoryMove state: highlight actions");
+      case gameState.giantResolution:
+        console.log("Entering giantResolution state: highlight actions");
         this.onEnteringGiantMandatoryMove();
         break;
-      case gameState.giantPlayerChoice:
-        console.log("Entering giantPlayerChoice state: highlight actions");
-        this.onEnteringGiantOptionalMove();
+      case gameState.heroesDistribution:
+        console.log("Entering heroesDistribution state: Do nothing");
         break;
-      case gameState.giantSpecialAction:
-        this.onEnteringGiantSpecialAction(args.args);
-        break;
-      case gameState.heroPhase:
+      case gameState.heroesActions:
         this.onEnteringHeroePhase(args.args);
+        break;
+      case gameState.cityVerification:
+        console.log("Entering cityVerification state: Do nothing");
         break;
       default:
         break;
@@ -152,24 +151,24 @@ class AmenazaGigante extends GameGui<AmenazaGiganteGamedatas> implements Amenaza
 
   public onLeavingState(stateName: string) {
     switch (stateName) {
-      case gameState.heroSelection:
-        console.log("leaving heroSelection state: Do nothing");
+      case gameState.playerSelectHeroes:
+        console.log("leaving playerSelectHeroes state: Do nothing");
         // document.getElementById('heroe-table-center').dataset.visible = 'true';
         break;
-      case gameState.initGiantTurn:
-        console.log("leaving initGiantTurn");
+      case gameState.giantAdvance:
+        console.log("leaving giantAdvance");
         break;
-      case gameState.giantMandatoryMove:
+      case gameState.giantResolution:
         this.onLeavingGiantMandatoryMove();
         break;
-      case gameState.giantPlayerChoice:
-        this.onLeavingGiantOptionalMove();
+      case gameState.heroesDistribution:
+        console.log("leaving heroesDistribution");
         break;
-      case gameState.giantSpecialAction:
-        this.onLeavingGiantSpecialAction();
-        break;
-      case gameState.heroPhase:
+      case gameState.heroesActions:
         this.onLeavingHeroePhase();
+        break;
+      case gameState.cityVerification:
+        console.log("leaving cityVerification");
         break;
       default:
         break;
@@ -223,7 +222,7 @@ class AmenazaGigante extends GameGui<AmenazaGiganteGamedatas> implements Amenaza
     console.log("onUpdateActionButtons");
 
     switch (stateName) {
-      case gameState.heroSelection:
+      case gameState.playerSelectHeroes:
         this.statusBar.addActionButton("Confirm Selection", () => {
           const setup = this.setupHeroTableCenter;
           if (!setup.allCardsSelected()) {
@@ -239,7 +238,7 @@ class AmenazaGigante extends GameGui<AmenazaGiganteGamedatas> implements Amenaza
           });
         });
         break;
-      case gameState.giantMandatoryMove:
+      case gameState.giantResolution:
         break;
 
       default:
@@ -273,10 +272,10 @@ class AmenazaGigante extends GameGui<AmenazaGiganteGamedatas> implements Amenaza
   public onGiantTableCardClick(id: number, sector: TGiantArea, index: number) {
     console.log(id, sector, index, this.gamedatas.gamestate.name);
     switch (this.gamedatas.gamestate.name) {
-      case gameState.giantMandatoryMove:
+      case gameState.giantResolution:
         this.playGiantAction(id, sector, index, "actExecuteMandatoryAction");
         break;
-      case gameState.giantPlayerChoice:
+      case gameState.giantResolution:
         console.log("aca");
         this.playGiantAction(id, sector, index, "actExecuteOptionalAction");
         break;

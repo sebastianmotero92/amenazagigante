@@ -70,18 +70,42 @@ interface AmenazaGiganteGame extends Game {
 }
 
 type StateArgsMap = {
-    heroSelection: ArgsHeroSelection;
-    giantMandatoryMove: ArgsGiantMandatoryMove;
-    giantOptionalMove: ArgsGiantOptionalMove;
-    giantSpecialAction: ArgsGiantSpecialAction;
-    heroPhase: ArgsHeroePhase;
+    playerSelectHeroes: ArgsHeroSelection;
+    giantAdvance: ArgsGiantAdvance;
+    giantResolution: ArgsGiantResolution;
+    heroesDistribution: ArgsHeroesDistribution;
+    heroesActions: ArgsHeroesActions;
+    cityVerification: ArgsCityVerification;
 };
 
 type AnyStateArgs = StateArgsMap[keyof StateArgsMap];
 
 // ARGS
 interface ArgsHeroSelection {
-    heroCards: HeroeCard[]; // the hero cards sorted by their image location.
+    heroes: { hero_id: number; card_id: number; type: string }[]; // the hero cards from deck
+    nbToSelect: number; // 3 heroes to select
+    heroCards?: HeroeCard[]; // for compatibility with existing UI
+}
+
+interface ArgsGiantAdvance {
+    // Arguments for giant advance state
+}
+
+interface ArgsGiantResolution {
+    action_name: string;
+    // Arguments for giant resolution state
+}
+
+interface ArgsHeroesDistribution {
+    // Arguments for heroes distribution state
+}
+
+interface ArgsHeroesActions {
+    // Arguments for heroes actions state
+}
+
+interface ArgsCityVerification {
+    // Arguments for city verification state
 }
 
 interface ArgsGiantMandatoryMove {

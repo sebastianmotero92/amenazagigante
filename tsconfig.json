@@ -41,7 +41,7 @@
     "src/heroes.ts",
     "src/giant.ts",
     "src/giant-table-center.ts",
-    "src/hero-table-center.ts",
+    "src/heroe-table-center.ts",
     "src/city-table-center.ts",
     "src/setup-hero-table-center.ts",
     "src/utils.ts"

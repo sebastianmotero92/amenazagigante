@@ -23,8 +23,8 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 var __generator = (this && this.__generator) || function (thisArg, body) {
-    var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g = Object.create((typeof Iterator === "function" ? Iterator : Object).prototype);
-    return g.next = verb(0), g["throw"] = verb(1), g["return"] = verb(2), typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
+    var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g;
+    return g = { next: verb(0), "throw": verb(1), "return": verb(2) }, typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
     function verb(n) { return function (v) { return step([n, v]); }; }
     function step(op) {
         if (f) throw new TypeError("Generator is already executing.");
@@ -52,12 +52,12 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 var LOCAL_STORAGE_ZOOM_KEY = "AmenazaGigante-zoom";
 // @ts-ignore
 var gameState = {
-    heroSelection: "heroSelection",
-    initGiantTurn: "initGiantTurn",
-    giantMandatoryMove: "giantMandatoryMove",
-    giantPlayerChoice: "giantPlayerChoice",
-    giantSpecialAction: "giantSpecialAction",
-    heroPhase: "heroPhase"
+    playerSelectHeroes: "playerSelectHeroes",
+    giantAdvance: "giantAdvance",
+    giantResolution: "giantResolution",
+    heroesDistribution: "heroesDistribution",
+    heroesActions: "heroesActions",
+    cityVerification: "cityVerification"
 };
 var actName = {
     selectHeroes: "actSelectHeroes",
@@ -94,7 +94,7 @@ var AmenazaGigante = /** @class */ (function (_super) {
         this.giantTableCenter = new GiantTableCenter(this, giantCards);
         this.giantManager = new GiantManager(giantPosition, giantArea, giantCards, this);
         this.giantManager.setupGiant();
-        if (this.currentGameState === gameState.heroSelection) {
+        if (this.currentGameState === gameState.playerSelectHeroes) {
             console.log("Entering hero selection state SETUP");
             document.getElementById("heroe-table-center").dataset.visible = "false";
             this.setupHeroTableCenter = new SetupHeroTableCenter(this.cardsManager, args);
@@ -115,7 +115,7 @@ var AmenazaGigante = /** @class */ (function (_super) {
             zoomLevels: [0.25, 0.375, 0.5, 0.625, 0.75, 0.875, 1, 1.25, 1.5, 1.75, 2],
             localStorageZoomKey: LOCAL_STORAGE_ZOOM_KEY,
             autoZoom: {
-                expectedWidth: 880, // for the lines of cards of the table to fit
+                expectedWidth: 880,
                 minZoomLevel: 0.5
             }
         });
@@ -125,25 +125,24 @@ var AmenazaGigante = /** @class */ (function (_super) {
     AmenazaGigante.prototype.onEnteringState = function (stateName, args) {
         console.log("Entering state: " + stateName, args.args);
         switch (stateName) {
-            case gameState.heroSelection:
-                console.log("Entering heroSelection state: Do nothing");
+            case gameState.playerSelectHeroes:
+                console.log("Entering playerSelectHeroes state: Do nothing");
                 break;
-            case gameState.initGiantTurn:
-                console.log("Entering initGiantTurn state: Do nothing");
+            case gameState.giantAdvance:
+                console.log("Entering giantAdvance state: Do nothing");
                 break;
-            case gameState.giantMandatoryMove:
-                console.log("Entering giantMandatoryMove state: highlight actions");
+            case gameState.giantResolution:
+                console.log("Entering giantResolution state: highlight actions");
                 this.onEnteringGiantMandatoryMove();
                 break;
-            case gameState.giantPlayerChoice:
-                console.log("Entering giantPlayerChoice state: highlight actions");
-                this.onEnteringGiantOptionalMove();
+            case gameState.heroesDistribution:
+                console.log("Entering heroesDistribution state: Do nothing");
                 break;
-            case gameState.giantSpecialAction:
-                this.onEnteringGiantSpecialAction(args.args);
-                break;
-            case gameState.heroPhase:
+            case gameState.heroesActions:
                 this.onEnteringHeroePhase(args.args);
+                break;
+            case gameState.cityVerification:
+                console.log("Entering cityVerification state: Do nothing");
                 break;
             default:
                 break;
@@ -151,24 +150,24 @@ var AmenazaGigante = /** @class */ (function (_super) {
     };
     AmenazaGigante.prototype.onLeavingState = function (stateName) {
         switch (stateName) {
-            case gameState.heroSelection:
-                console.log("leaving heroSelection state: Do nothing");
+            case gameState.playerSelectHeroes:
+                console.log("leaving playerSelectHeroes state: Do nothing");
                 // document.getElementById('heroe-table-center').dataset.visible = 'true';
                 break;
-            case gameState.initGiantTurn:
-                console.log("leaving initGiantTurn");
+            case gameState.giantAdvance:
+                console.log("leaving giantAdvance");
                 break;
-            case gameState.giantMandatoryMove:
+            case gameState.giantResolution:
                 this.onLeavingGiantMandatoryMove();
                 break;
-            case gameState.giantPlayerChoice:
-                this.onLeavingGiantOptionalMove();
+            case gameState.heroesDistribution:
+                console.log("leaving heroesDistribution");
                 break;
-            case gameState.giantSpecialAction:
-                this.onLeavingGiantSpecialAction();
-                break;
-            case gameState.heroPhase:
+            case gameState.heroesActions:
                 this.onLeavingHeroePhase();
+                break;
+            case gameState.cityVerification:
+                console.log("leaving cityVerification");
                 break;
             default:
                 break;
@@ -213,7 +212,7 @@ var AmenazaGigante = /** @class */ (function (_super) {
         var _this = this;
         console.log("onUpdateActionButtons");
         switch (stateName) {
-            case gameState.heroSelection:
+            case gameState.playerSelectHeroes:
                 this.statusBar.addActionButton("Confirm Selection", function () {
                     var setup = _this.setupHeroTableCenter;
                     if (!setup.allCardsSelected()) {
@@ -228,7 +227,7 @@ var AmenazaGigante = /** @class */ (function (_super) {
                     });
                 });
                 break;
-            case gameState.giantMandatoryMove:
+            case gameState.giantResolution:
                 break;
             default:
                 break;
@@ -256,10 +255,10 @@ var AmenazaGigante = /** @class */ (function (_super) {
     AmenazaGigante.prototype.onGiantTableCardClick = function (id, sector, index) {
         console.log(id, sector, index, this.gamedatas.gamestate.name);
         switch (this.gamedatas.gamestate.name) {
-            case gameState.giantMandatoryMove:
+            case gameState.giantResolution:
                 this.playGiantAction(id, sector, index, "actExecuteMandatoryAction");
                 break;
-            case gameState.giantPlayerChoice:
+            case gameState.giantResolution:
                 console.log("aca");
                 this.playGiantAction(id, sector, index, "actExecuteOptionalAction");
                 break;
@@ -780,24 +779,24 @@ var AnimationManager = /** @class */ (function () {
      * @returns the animation promise.
      */
     AnimationManager.prototype.play = function (animation) {
+        var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m, _o, _p, _q;
         return __awaiter(this, void 0, void 0, function () {
-            var settings, _a;
-            var _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m, _o, _p, _q, _r;
+            var settings, _r;
             return __generator(this, function (_s) {
                 switch (_s.label) {
                     case 0:
                         animation.played = animation.playWhenNoAnimation || this.animationsActive();
                         if (!animation.played) return [3 /*break*/, 2];
                         settings = animation.settings;
-                        (_b = settings.animationStart) === null || _b === void 0 ? void 0 : _b.call(settings, animation);
-                        (_c = settings.element) === null || _c === void 0 ? void 0 : _c.classList.add((_d = settings.animationClass) !== null && _d !== void 0 ? _d : 'bga-animations_animated');
-                        animation.settings = __assign({ duration: (_h = (_f = (_e = animation.settings) === null || _e === void 0 ? void 0 : _e.duration) !== null && _f !== void 0 ? _f : (_g = this.settings) === null || _g === void 0 ? void 0 : _g.duration) !== null && _h !== void 0 ? _h : 500, scale: (_m = (_k = (_j = animation.settings) === null || _j === void 0 ? void 0 : _j.scale) !== null && _k !== void 0 ? _k : (_l = this.zoomManager) === null || _l === void 0 ? void 0 : _l.zoom) !== null && _m !== void 0 ? _m : undefined }, animation.settings);
-                        _a = animation;
+                        (_a = settings.animationStart) === null || _a === void 0 ? void 0 : _a.call(settings, animation);
+                        (_b = settings.element) === null || _b === void 0 ? void 0 : _b.classList.add((_c = settings.animationClass) !== null && _c !== void 0 ? _c : 'bga-animations_animated');
+                        animation.settings = __assign({ duration: (_g = (_e = (_d = animation.settings) === null || _d === void 0 ? void 0 : _d.duration) !== null && _e !== void 0 ? _e : (_f = this.settings) === null || _f === void 0 ? void 0 : _f.duration) !== null && _g !== void 0 ? _g : 500, scale: (_l = (_j = (_h = animation.settings) === null || _h === void 0 ? void 0 : _h.scale) !== null && _j !== void 0 ? _j : (_k = this.zoomManager) === null || _k === void 0 ? void 0 : _k.zoom) !== null && _l !== void 0 ? _l : undefined }, animation.settings);
+                        _r = animation;
                         return [4 /*yield*/, animation.animationFunction(this, animation)];
                     case 1:
-                        _a.result = _s.sent();
-                        (_p = (_o = animation.settings).animationEnd) === null || _p === void 0 ? void 0 : _p.call(_o, animation);
-                        (_q = settings.element) === null || _q === void 0 ? void 0 : _q.classList.remove((_r = settings.animationClass) !== null && _r !== void 0 ? _r : 'bga-animations_animated');
+                        _r.result = _s.sent();
+                        (_o = (_m = animation.settings).animationEnd) === null || _o === void 0 ? void 0 : _o.call(_m, animation);
+                        (_p = settings.element) === null || _p === void 0 ? void 0 : _p.classList.remove((_q = settings.animationClass) !== null && _q !== void 0 ? _q : 'bga-animations_animated');
                         return [3 /*break*/, 3];
                     case 2: return [2 /*return*/, Promise.resolve(animation)];
                     case 3: return [2 /*return*/];
@@ -1123,11 +1122,11 @@ var CardStock = /** @class */ (function () {
      * @param settings a `AddCardSettings` object
      * @param shift if number, the number of milliseconds between each card. if true, chain animations
      */
-    CardStock.prototype.addCards = function (cards_1, animation_1, settings_1) {
-        return __awaiter(this, arguments, void 0, function (cards, animation, settings, shift) {
+    CardStock.prototype.addCards = function (cards, animation, settings, shift) {
+        if (shift === void 0) { shift = false; }
+        return __awaiter(this, void 0, void 0, function () {
             var promises, result, others, _loop_2, i, results;
             var _this = this;
-            if (shift === void 0) { shift = false; }
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
@@ -1399,9 +1398,9 @@ var CardStock = /** @class */ (function () {
      * @param fromElement The HTMLElement to animate from.
      */
     CardStock.prototype.animationFromElement = function (element, fromRect, settings) {
+        var _a;
         return __awaiter(this, void 0, void 0, function () {
             var side, cardSides_1, animation, result;
-            var _a;
             return __generator(this, function (_b) {
                 switch (_b.label) {
                     case 0:
@@ -1504,8 +1503,9 @@ var SlideAndBackAnimation = /** @class */ (function (_super) {
 var Deck = /** @class */ (function (_super) {
     __extends(Deck, _super);
     function Deck(manager, element, settings) {
+        var _this = this;
         var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l;
-        var _this = _super.call(this, manager, element) || this;
+        _this = _super.call(this, manager, element) || this;
         _this.manager = manager;
         _this.element = element;
         element.classList.add('deck');
@@ -1620,9 +1620,9 @@ var Deck = /** @class */ (function (_super) {
         _super.prototype.cardRemoved.call(this, card, settings);
     };
     Deck.prototype.removeAll = function (settings) {
+        var _a, _b;
         return __awaiter(this, void 0, void 0, function () {
             var promise;
-            var _a, _b;
             return __generator(this, function (_c) {
                 promise = _super.prototype.removeAll.call(this, __assign(__assign({}, settings), { autoUpdateCardNumber: (_a = settings === null || settings === void 0 ? void 0 : settings.autoUpdateCardNumber) !== null && _a !== void 0 ? _a : false }));
                 if ((_b = settings === null || settings === void 0 ? void 0 : settings.autoUpdateCardNumber) !== null && _b !== void 0 ? _b : true) {
@@ -1644,10 +1644,10 @@ var Deck = /** @class */ (function (_super) {
      * @returns promise when animation ends
      */
     Deck.prototype.shuffle = function (settings) {
+        var _a, _b, _c;
         return __awaiter(this, void 0, void 0, function () {
             var animatedCardsMax, animatedCards, elements, getFakeCard, uid, i, newCard, newElement, pauseDelayAfterAnimation;
             var _this = this;
-            var _a, _b, _c;
             return __generator(this, function (_d) {
                 switch (_d.label) {
                     case 0:
@@ -1704,8 +1704,9 @@ var Deck = /** @class */ (function (_super) {
 var AllVisibleDeck = /** @class */ (function (_super) {
     __extends(AllVisibleDeck, _super);
     function AllVisibleDeck(manager, element, settings) {
+        var _this = this;
         var _a, _b, _c, _d, _e, _f, _g, _h, _j;
-        var _this = _super.call(this, manager, element, settings) || this;
+        _this = _super.call(this, manager, element, settings) || this;
         _this.manager = manager;
         _this.element = element;
         element.classList.add('all-visible-deck', (_a = settings.direction) !== null && _a !== void 0 ? _a : 'vertical');
@@ -1789,8 +1790,9 @@ var LineStock = /** @class */ (function (_super) {
      * @param settings a `LineStockSettings` object
      */
     function LineStock(manager, element, settings) {
+        var _this = this;
         var _a, _b, _c, _d;
-        var _this = _super.call(this, manager, element, settings) || this;
+        _this = _super.call(this, manager, element, settings) || this;
         _this.manager = manager;
         _this.element = element;
         element.classList.add('line-stock');
@@ -1813,8 +1815,9 @@ var SlotStock = /** @class */ (function (_super) {
      * @param settings a `SlotStockSettings` object
      */
     function SlotStock(manager, element, settings) {
+        var _this = this;
         var _a, _b;
-        var _this = _super.call(this, manager, element, settings) || this;
+        _this = _super.call(this, manager, element, settings) || this;
         _this.manager = manager;
         _this.element = element;
         _this.slotsIds = [];
@@ -2282,7 +2285,7 @@ var CardsManager = /** @class */ (function (_super) {
             setupFrontDiv: function (card, div) { return _this.setupFrontDiv(card, div); },
             isCardVisible: function (card) { return !card.flipped; },
             animationManager: game.animationManager,
-            cardWidth: 186, //149,
+            cardWidth: 186,
             cardHeight: 260 //208,
         }) || this;
         _this.game = game;
@@ -3169,11 +3172,11 @@ var GiantManager = /** @class */ (function () {
             // Estilo del token
             Object.assign(giantElem.style, {
                 position: "absolute",
-                top: "".concat(toppx[mapAreaName(this.giantArea)], "px"), // o ajustalo si querés centrar verticalmente
+                top: "".concat(toppx[mapAreaName(this.giantArea)], "px"),
                 // left: `${currCardElem.offsetWidth - 200}px`, // al costado derecho con 5px de offset
                 left: "-38px",
                 width: "".concat(currCardElem.offsetWidth / 3, "px"),
-                height: "auto", // mantener proporciones
+                height: "auto",
                 zIndex: "11" // aseguramos que esté arriba
             });
             // Agregamos el token al DOM si no está ya dentro
@@ -3281,13 +3284,13 @@ var GiantTableCenter = /** @class */ (function () {
         });
         for (var i = visibleCards.length; i < totalCards; i++) {
             fakeCards.push({
-                flipped: true, // por si querés forzar que no se pueda interactuar
-                id: 1000 + i, // un id que no colisione con los reales
+                flipped: true,
+                id: 1000 + i,
                 location: 'giant-row',
                 locationArg: 0,
-                type: 2, // o el tipo que corresponda al dorso
+                type: 2,
                 typeArg: 1,
-                index: 10, // este seria cual GCard se coloca esto hace que se pinte el dorso (según CardsManager)
+                index: 10,
                 sections: [],
                 // fake: true, // opcional, si querés identificarlas después
             });
