@@ -27,7 +27,7 @@ require_once(__DIR__ . '/objects/track.php');
 require_once(__DIR__ . '/objects/rondel.php');
 require_once(__DIR__ . '/utils/constants.inc.php');
 require_once(__DIR__ . '/utils/utils.inc.php');
-require_once(__DIR__ . '/actions/StageAction.php');
+require_once(__DIR__ . '/states.php');
 require_once(__DIR__ . '/actions.php');
 require_once(__DIR__ . '/args.php');
 
@@ -35,7 +35,7 @@ class Game extends \Table
 {
     use \UtilsTrait;
     use \ArgsTrait;
-    use \StageAction;
+    use \StateTrait;
     use \ActionTrait;
 
     public \Deck $cards;
@@ -48,8 +48,7 @@ class Game extends \Table
         $this->initGameStateLabels([
             "giant_position_card" => 10,
             "giant_position_area" => 11,
-            "my_first_game_variant" => 100,
-            "my_second_game_variant" => 101,
+            "giant_special_action" => 12,
             "game_state" => 102
         ]);
 
@@ -187,6 +186,8 @@ class Game extends \Table
     {
         $result = [];
 
+        $isGameInitializated = intval($this->gamestate->state_id()) != 82;
+    
         // WARNING: We must only return information visible by the current player.
         $current_player_id = (int) $this->getCurrentPlayerId();
 
@@ -196,20 +197,41 @@ class Game extends \Table
             "SELECT `player_id` `id`, `player_score` `score` FROM `player`"
         );
 
-        $result['trackState'] = $this->getGameTracksState();
-        $result['giantCards'] = $this->getCardsByLocation(TABLE_GIANT);
-        $result['heroeCards'] = $this->getCardsByLocation(TABLE_HEROE);
-        $result['rondels'] = ($this->getRondelPosition())->getRondelsInfo();
-        $result['giantPosition'] = $this->getGiantPos();
-        $result['giantArea'] = $this->getGiantPosArea();
+        $result['cityData'] = [
+                'track' => $this->getGameTracksState(),
+            ];
 
-        // $testCard = $result['giantCards'][2];
-        // if ($testCard instanceof GiantCard) {
-        //     $testCard->getSpecialAction($testCard->sections[0]->optional[0]);
-        //     // $testCard->getNumberOfActions(false, 0);
-        // }
-        // $testCard.getNumberOfActions(true);
-        // TODO: Gather all information about current game situation (visible by player $current_player_id).
+            $result['giantData'] = [
+                'giantCards' => $this->getCardsByLocation(TABLE_GIANT),
+                'giantPosition' => $this->getGiantPos(),
+                'giantArea' => $this->getGiantPosArea(),
+            ];
+
+        // If player is selecting heroes the game state is not initialized. no info to send
+        if (!$isGameInitializated) {
+            return $result;
+        }
+        
+
+        if ($isGameInitializated) {
+            // $result['trackState'] = $this->getGameTracksState();
+            // $result['giantCards'] = 
+            // $result['giantPosition'] = $this->getGiantPos();
+            // $result['giantArea'] = $this->getGiantPosArea();
+            // $result['heroeCards'] = $this->getCardsByLocation(TABLE_HEROE);
+            // $result['rondels'] = ($this->getRondelManager())->getAllData();
+
+            $result['heroData'] = [
+                'heroCards' => $this->getCardsByLocation(TABLE_HEROE),
+                'rondels' => ($this->getRondelManager())->getAllData()
+            ];
+            $result['giantData'] = [
+                'giantCards' => $this->getCardsByLocation(TABLE_GIANT),
+                'giantPosition' => $this->getGiantPos(),
+                'giantArea' => $this->getGiantPosArea(),
+            ];
+            
+        }
 
         return $result;
     }
@@ -261,26 +283,19 @@ class Game extends \Table
         $this->reloadPlayersBasicInfos();
 
         // Init global values with their initial values.
-
-        // Dummy content.
-        // $this->setGameStateInitialValue("my_first_global_variable", 0);
-
         self::DbQuery("INSERT INTO generalTracks () VALUES ()");
-
 
         // Create cards in deck. 1 => heroes | 2 => giant path
         $this->setupCards();
 
-
-        $this->setGameStateValue('giant_position_card', 0); // posición inicial
+        $this->setGiantPos(0);
         $this->setGiantArea(0);
-        // $this->setGameStateValue('giant_position_area', 0); // lado A
+        $this->setSpecialGiantAction(0);
         $this->setGameState(GAME_STATE['INITIAL']);
-        $this->selectHeroes([3, 5, 7]);
 
-        self::DbQuery("INSERT INTO rondelPosition (rondel_char, heroe_card) VALUES ('A', 3)");
-        self::DbQuery("INSERT INTO rondelPosition (rondel_char, heroe_card) VALUES ('B', 5)");
-        self::DbQuery("INSERT INTO rondelPosition (rondel_char, heroe_card) VALUES ('C', 7)");
+        // self::DbQuery("INSERT INTO rondelPosition (rondel_char, heroe_card) VALUES ('A', 3)");
+        // self::DbQuery("INSERT INTO rondelPosition (rondel_char, heroe_card) VALUES ('B', 5)");
+        // self::DbQuery("INSERT INTO rondelPosition (rondel_char, heroe_card) VALUES ('C', 7)");
 
         // Init game statistics.
         //
@@ -334,7 +349,8 @@ class Game extends \Table
 
     function debug_setState(string $state)
     {
+        $this->actSelectHeroes('1', '4', '7');
         // $this->DbQuery("UPDATE card SET card_type = $type, card_type_arg = $typeArg WHERE card_id = $id" );
-        $this->gamestate->nextState($state);
+        // $this->gamestate->nextState($state);
     }
 }

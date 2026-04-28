@@ -67,24 +67,36 @@ $machinestates = array(
         "description" => "",
         "type" => "manager",
         "action" => "stGameSetup",
-        "transitions" => array("" => 10 )
+        "transitions" => array("" => 82 )
     ),
 
     // Note: ID=2 => your first state
+
+    82 => array(
+        "name" => "heroSelection",
+        "descriptionmyturn" => clienttranslate('${you} should select your 3 heroes'),
+        "description" => clienttranslate("Select your 3 heroes"),
+        "type" => "activeplayer",
+        "args" => "argHeroSelection",
+        "possibleactions" => array(
+            "actSelectHeroes",
+        ),
+        "transitions" => array("done" => 10)
+    ),
 
     10  => array(
         "name" => "initGiantTurn",
         "type" => "game",
         "action" => "stPickUpGiantCard",
         "updateGameProgression" => true,
-        "transitions" => array("mandatory" => 11, "optional" => 12)
+        "transitions" => array("mandatory" => 11, "optional" => 12, "special" => 13)
     ),
 
     11  => array(
         "name" => "giantMandatoryMove",
         "descriptionmyturn" => clienttranslate('${you} must activate mandatory action for the Giant'),
         "type" => "activeplayer",
-        "args" => "argGiantMandatoryMove",
+        // "args" => "argGiantMandatoryMove",
         "possibleactions" => array(
             // these actions are called from the front with bgaPerformAction, and matched to the function on the game.php file
             "actExecuteMandatoryAction",
@@ -96,7 +108,7 @@ $machinestates = array(
         "name" => "giantPlayerChoice",
         "descriptionmyturn" => clienttranslate('${you} must choose an optional action for the Giant'),
         "type" => "activeplayer",
-        "args" => "argGiantPlayerChoice",
+        // "args" => "argGiantPlayerChoice",
         "possibleactions" => array(
             "actExecuteOptionalAction",
         ),
@@ -107,8 +119,10 @@ $machinestates = array(
         "name" => "giantSpecialAction",
         "descriptionmyturn" => clienttranslate('${you} must use the rondels'),
         "type" => "activeplayer",
+        "args" => "argGiantSpecialAction",
         "possibleactions" => array(
-            "actExecuteSpecialAction",
+            "actExecuteSpecialSwitchAction",
+            "actExecuteSpecialMoveAction"
         ),
         "transitions" => ["optional" => 12, "done" => 20, "debug" => 11, "end" => 99]
     ),

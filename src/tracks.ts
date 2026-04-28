@@ -65,36 +65,36 @@ const mapTrackId = {
 
 class TrackManager {
   private trackState: TrackState;
+  private game: any;
 
-  constructor(public game: AmenazaGiganteGame) {
-    this.trackState = game.gamedatas.trackState;
+  constructor(public trackStateParam: TrackState, game: any) {
+    this.trackState = trackStateParam;
+    this.game = game;
   }
 
-  public setupTrack() {
-    for (const track in this.trackState) {
-      console.log("track", track, this.trackState[track]);
-      this.printTokenOnBoard(
+  public async setupTrack() {
+    const operations = [];
+      for (const track in this.trackState) {
+      operations.push(this.printTokenOnBoard(
         this.getTokenIdForTrack(track as TrackParam),
         this.getTargetPositionIdForTrack(track as TrackParam)
-      );
+      ));
     }
+    await Promise.all(operations);
   }
 
-  private moveToken(track: TrackParam, newPosition: number) {
+  private async moveToken(track: TrackParam, newPosition: number) {
     this.updateTrackValue(track, newPosition);
-    this.printTokenOnBoard(
+    await this.printTokenOnBoard(
       this.getTokenIdForTrack(track),
       this.getTargetPositionIdForTrack(track)
     );
   }
 
-  public updateTokens(tracks: TrackState) {
+  public async updateTokens(tracks: TrackState) {
     for (const track in tracks) {
-        console.log(tracks[track])
-        console.log(this.trackState[track])
         if (tracks[track] !== this.trackState[track]) {
-            console.log('cambio ' + tracks[track])
-            this.moveToken(track as TrackParam, tracks[track]);
+            await this.moveToken(track as TrackParam, tracks[track]);
         }
     }
   }
@@ -132,7 +132,7 @@ class TrackManager {
     return `${mapTrackId[track]}${this.trackState[track]}`;
   }
 
-  private async printTokenOnBoard(origId, destId) {
+  async printTokenOnBoard(origId, destId) {
     const token = document.getElementById(origId);
     const target = document.getElementById(destId);
 
@@ -140,7 +140,7 @@ class TrackManager {
     token.style.left = "0px";
     token.style.top = "0px";
 
-    console.log(this.game.bgaPlayDojoAnimation);
+    // console.log(this.game.bgaPlayDojoAnimation);
     const anim = this.game.slideToObject(token.id, target.id);
     await this.game.bgaPlayDojoAnimation(anim);
 

@@ -1,189 +1,254 @@
 <?php
-trait ActionTrait
-{
-    // use UtilsTrait;
-
-    public function actExecuteSpecialAction(array $rondelsArr, string $movement, int $newLocation): void
-    {
-        // TODO CHECK
-        
-        $rondels = $this->getRondelPosition();
-        
-        if(count($rondelsArr) == 1) {
-            // movement
-            $rondel = $rondels->getRondelByChar($rondelsArr[0]);
-            $rondels->updateRondelPosByRondel($rondelsArr[0], $newLocation, $movement);
-        } else {
-            // exchange
-            $rondels->switchRondels($rondelsArr[0], $rondelsArr[1]);
+trait ActionTrait {
+    private function checkOnlySpecialAction($card, $actions, $numActions, $hasSpecialAction): bool {
+        if ($numActions == 1 && $hasSpecialAction) {
+            $specialAction = $card->getSpecialAction($actions);
+            $actionValue = $specialAction->value;
+            $this->setSpecialGiantAction($actionValue);
+            $this->notify->all("specialGiantAction", clienttranslate("A rondel action is available"), [
+                "specialGiantAction" => $actionValue,
+            ]);
+            $this->gamestate->nextState("special");
+            return true;
         }
-
-        $this->updateRondelMovement($rondel);
-
-        // $result = $this->executeGiantAction($nCard, $sector, $actionIndex, $giantCard, $actionType);
-
-        // option 1 mandatory -> chequear optional o salir
-
-        // option 2 optional -> salir
-
-        // if ($result['special'] == true) {
-        //     $this->gamestate->nextState('special');
-        // } else if ($result['optionalActions'] == true) {
-        //     $this->gamestate->nextState('next');
-        // } else {
-        //     $this->gamestate->nextState('done');
-        // }
+        return false;
     }
 
-    public function actExecuteMandatoryAction(int $idCard, string $sector, int $index): void
-    {
-        $args = $this->argGiantMandatoryMove();
+    private function applyActions($actions) {
+        // Get trackState & update obj
+        $log = null;
+        $trackState = $this->getGameTracksState();
+        $trackState->updateTracksByActions($actions, $log);
 
-        // TODO check is is the last card, position
+        // Update trackState in DB
+        $this->updateGameTracksState($trackState);
+
+        $this->notify->all("giantAction", clienttranslate('Giant actions applied: ${log}'), [
+            'cityData' => [
+                'track' => $trackState,
+            ],
+            "log" => $log,
+        ]);
+    }
+
+    public function actExecuteMandatoryAction(int $idCard, int $sector, int $index): void {
+        $giantCards = $this->getCardsByLocation(TABLE_GIANT);
+
         /** @var GiantCard */
-        $card = array_find($args['giantCards'], fn($card) => $card->id === $idCard);
+        $card = array_find($giantCards, fn($card) => $card->id === $idCard);
         if (!$card) {
-            throw new \BgaUserException("ERROR");
+            throw new \BgaUserException("ERROR 1");
         }
-
-        $numSector = $card->getNumberSector($sector);
 
         /** @var GiantCardSection */
-        $section = $card->sections[$numSector];
+        $section = $card->sections[$sector];
         if (!$section) {
-            throw new \BgaUserException("ERROR");
+            throw new \BgaUserException("ERROR 2");
         }
 
-        // Mandatory action always should be index 1
-        if ($index != 1) {
-            throw new \BgaUserException("ERROR");
-        }
-
-        $numMandatoryActions = $card->getNumberOfActions(true, $numSector);
+        $numMandatoryActions = $card->getNumberOfActions(true, $sector);
         if ($numMandatoryActions == 0) {
-            throw new \BgaUserException("ERROR");
+            throw new \BgaUserException("ERROR 3");
         }
-        
-        // Get trackState
-        $trackState = $this->getGameTracksState();
-        
+
+        // Mandatory action always should be index 0
+        if ($index != 0) {
+            throw new \BgaUserException("ERROR 4");
+        }
         /** @var GiantCardSlot */
         $actions = $section->mandatory;
-        $trackState->updateTracksByActions($actions);
 
-        // Update trackState in DB
-        $this->updateGameTracksState($trackState);
-        
-        $this->notify->all('giantAction', clienttranslate('Giant action notify '), array(
-            // 'giantCards' => $giantCards,
-            // 'nextArea' => $nextArea,
-            // 'pepe' => $action['description'],
-            // 'value' => $delta,
-            'track' => $trackState,
-        ));
-        
-        $this->checkEndGameCondition();
-        
         $hasSpecialAction = $card->hasSpecialAction($actions);
-        $numOptionalActions = $card->getNumberOfActions(false, $numSector);
+        // Check if mandatory has only 1 special action
+        if ($this->checkOnlySpecialAction($card, $actions, $numMandatoryActions, $hasSpecialAction)) {
+            return;
+        }
 
+        $this->applyActions($actions);
+
+        if ($this->checkEndGameCondition()) {
+            return;
+        }
+        $numOptionalActions = $card->getNumberOfActions(false, $sector);
         if ($hasSpecialAction) {
-            $this->gamestate->nextState('special');
+            $actionValue = $card->getSpecialAction($actions)->value;
+            $this->setSpecialGiantAction($actionValue);
+            $this->notify->all("specialGiantAction", "", [
+                "specialGiantAction" => $actionValue,
+            ]);
+            $this->gamestate->nextState("special");
         } elseif ($numOptionalActions > 0) {
-            $this->gamestate->nextState('optional');
+            $this->setGameState(GAME_STATE["OPTIONAL"]);
+            $this->gamestate->nextState("optional");
         } else {
+            $this->setGameState(GAME_STATE["HERO"]);
             // No special or optional action
-            $this->gamestate->nextState('done');
+            $this->gamestate->nextState("done");
         }
     }
 
-    public function actExecuteOptionalAction(int $idCard, string $sector, int $index)
-    {
-        
-        $args = $this->argGiantPlayerChoice();
-        
-        // TODO check is is the last card, position
+    public function actExecuteSpecialSwitchAction(string $rondelChar1, string $rondelChar2): void {
+        $rondelManager = $this->getRondelManager();
+
+        $rondelChar1 = RondelChar::from($rondelChar1);
+        $rondel1 = $rondelManager->getRondelByChar($rondelChar1);
+        $rondelChar2 = RondelChar::from($rondelChar2);
+        $rondel2 = $rondelManager->getRondelByChar($rondelChar2);
+        $rondelManager->switchRondels($rondelChar1, $rondelChar2);
+
+        $this->updateRondelMovement($rondel1);
+        $this->updateRondelMovement($rondel2);
+        $this->actExecuteSpecialAction($rondelManager);
+    }
+
+    public function actExecuteSpecialMoveAction(string $rondelChar, int $newLocation): void {
+        $rondelManager = $this->getRondelManager();
+
+        $rondelChar = RondelChar::from($rondelChar);
+        $rondel = $rondelManager->getRondelByChar($rondelChar);
+
+        $rondel->updateRondelPosition(RondelLocation::from($newLocation), RondelMovement::from(0));
+        $this->updateRondelMovement($rondel);
+        $this->actExecuteSpecialAction($rondelManager);
+    }
+
+    public function actExecuteSpecialAction($rondelManager): void {
+        $this->notify->all("specialActionDone", clienttranslate("Special action done"), [
+            "rondels" => $rondelManager->getAllData(),
+        ]);
+
+        $gameState = $this->getGameState();
+
+        if ($gameState == GAME_STATE["MANDATORY"]) {
+            // TODO check if optional
+            /** @var GiantCard[] */
+            $cards = $this->getCardsByLocation(TABLE_GIANT);
+            $giantPosition = $this->getGiantPos();
+            $area = $this->getGiantPosArea();
+
+            $card = $cards[$giantPosition - 1];
+
+            $numOptionalActions = $card->getNumberOfActions(false, $area);
+            if ($numOptionalActions > 0) {
+                $this->gamestate->nextState("optional");
+            } else {
+                $this->gamestate->nextState("done");
+            }
+        } elseif ($gameState == GAME_STATE["OPTIONAL"]) {
+            $this->gamestate->nextState("done");
+        }
+    }
+
+    public function actExecuteOptionalAction(int $idCard, int $sector, int $index) {
+        $giantCards = $this->getCardsByLocation(TABLE_GIANT);
+
         /** @var GiantCard */
-        $card = array_find($args['giantCards'], fn($card) => $card->id === $idCard);
+        $card = array_find($giantCards, fn($card) => $card->id === $idCard);
         if (!$card) {
-            throw new \BgaUserException("ERROR");
+            throw new \BgaUserException("ERROR CARD NOT FOUND");
         }
-        
-        $numSector = $card->getNumberSector($sector);
-        
+
         /** @var GiantCardSection */
-        $section = $card->sections[$numSector];
+        $section = $card->sections[$sector];
         if (!$section) {
-            throw new \BgaUserException("ERROR");
+            throw new \BgaUserException("ERROR SECTOR");
         }
-        
-        $numOptionalActions = $card->getNumberOfActions(false, $numSector);
+
+        $numOptionalActions = $card->getNumberOfActions(false, $sector);
         if ($numOptionalActions == 0) {
-            throw new \BgaUserException("ERROR");
+            throw new \BgaUserException("ERROR ACTION");
         }
-        
-        if ($index < 1 || $index > $numOptionalActions) {
-            throw new \BgaUserException("ERROR");
+
+        if ($index < 0 || $index > $numOptionalActions) {
+            throw new \BgaUserException("ERROR INDEX");
         }
-        
-        
-        // Get trackState
-        $trackState = $this->getGameTracksState();
-        
+
         /** @var GiantCardSlot */
         $actions = $section->optional[$index];
-        $trackState->updateTracksByActions($actions);
 
-        // Update trackState in DB
-        $this->updateGameTracksState($trackState);
-        
-        $this->notify->all('giantAction', clienttranslate('Giant action notify '), array(
-            // 'giantCards' => $giantCards,
-            // 'nextArea' => $nextArea,
-            // 'pepe' => $action['description'],
-            // 'value' => $delta,
-            'track' => $trackState,
-        ));
-
-        $this->checkEndGameCondition();
-        
         $hasSpecialAction = $card->hasSpecialAction($actions);
 
+        // Check if optional has only 1 special action
+        if ($this->checkOnlySpecialAction($card, $actions, $numOptionalActions, $hasSpecialAction)) {
+            return;
+        }
+
+        $this->applyActions($actions);
+
+        if ($this->checkEndGameCondition()) {
+            return;
+        }
+
         if ($hasSpecialAction) {
-            $this->gamestate->nextState('special');
+            $actionValue = $card->getSpecialAction($actions)->value;
+            $this->setSpecialGiantAction($actionValue);
+            $this->notify->all("specialGiantAction", "", [
+                "specialGiantAction" => $actionValue,
+            ]);
+            $this->gamestate->nextState("special");
         } else {
             // No special action
-            $this->gamestate->nextState('done');
+            $this->setGameState(GAME_STATE["HERO"]);
+            $this->gamestate->nextState("done");
         }
     }
 
-    public function actExecuteHeroesAction(string $rondelChar, int $movement, int $newLocation): void
-    {
-        // TODO CHECK
-        $rondels = $this->getRondelPosition();
-        $rondel = $rondels->getRondelByChar($rondelChar);
-        $heroes =  $this->getCardsByLocation(TABLE_HEROE);
-        $trackState = $this->getGameTracksState();
+    public function actExecuteHeroesAction(string $rondelChar, int $movement, int $newLocation): void {
+        // TODO CHECK valid movements
+        $rondelManager = $this->getRondelManager();
 
-        $card = array_find($heroes, fn($heroe) => $heroe->typeArg === $rondel->heroe);
+        $rondelChar = RondelChar::from($rondelChar);
+        $rondel = $rondelManager->getRondelByChar($rondelChar);
+        $heroes = $this->getCardsByLocation(TABLE_HEROE);
+        $trackState = $this->getGameTracksState();
+        $card = array_find($heroes, fn($heroe) => $heroe->typeArg === $rondel->getHeroe());
         $ability = $card->actions->actions[$newLocation - 1];
 
-        
-        if ($ability->track != 1 && $ability->track != 8) {
+        if ($ability->track !== 1 && $ability->track !== 8) {
+            // Supply (5,6,7) & quality (2,3,4) tracks
             $trackState->updateTracksByHeroeAction($ability);
-            $this->updateGameTracksState($trackState);
+        } elseif ($ability->track === 1) {
+            // teamwork
+            $trackState->teamworkAction();
         }
+        $this->updateGameTracksState($trackState);
 
-        $rondels->updateRondelPosByRondel($rondelChar, $newLocation, $movement);
+        $rondel->updateRondelPosition(RondelLocation::from($newLocation), RondelMovement::from($movement));
+        $rondel->blockRondelMovement();
         $this->updateRondelMovement($rondel);
 
-        $this->notify->all('heroeAction', clienttranslate('Rondel ${rondelChar} moves ${movement} to ${newLocation} '), array(
-            'track' => $trackState,
-            'rondelChar' => $rondelChar,
-            'movement' => $movement,
-            'newLocation' => $newLocation,
-        ));
+        $this->notify->all("heroeAction", clienttranslate('Rondel ${rondelChar} moves ${movement} step to ${newLocation} position'), [
+            "track" => $trackState,
+            "rondelChar" => $rondelChar,
+            "movement" => $movement,
+            "newLocation" => $newLocation,
+        ]);
 
-        $this->gamestate->nextState('checkAvailableHeroeMoves');
+        $this->gamestate->nextState("checkAvailableHeroeMoves");
+    }
+
+    public function actSelectHeroes(string $cardA, string $cardB, string $cardC): void {
+        $this->selectHeroes([$cardA, $cardB, $cardC]);
+
+        $heroes = $this->getCardsByLocation(TABLE_HEROE);
+
+        self::DbQuery("DELETE FROM rondelPosition");
+        $sql = sprintf(
+            "INSERT INTO rondelPosition (rondel_char, heroe_card) VALUES ('A', %d), ('B', %d), ('C', %d)",
+            $heroes[0]->typeArg,
+            $heroes[1]->typeArg,
+            $heroes[2]->typeArg
+        );
+        self::DbQuery($sql);
+
+        $this->notify->all("heroesSelected", clienttranslate('Heroes selected: ${heroNames}'), [
+            "heroData" => [
+            "heroCards" => $this->getCardsByLocation(TABLE_HEROE),
+            "rondels" => $this->getRondelManager()->getAllData(),
+            ],
+            "heroNames" => implode(", ", array_map(fn($hero) => $hero->name, $heroes)),
+        ]);
+
+        $this->gamestate->nextState("done");
     }
 }

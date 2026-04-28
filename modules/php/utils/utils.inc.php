@@ -1,35 +1,24 @@
 <?php
 
-// namespace App\Utils;
+// function array_find(array $array, callable $fn)
+// {
+//     foreach ($array as $value) {
+//         if ($fn($value)) {
+//             return $value;
+//         }
+//     }
+//     return null;
+// }
 
-// require_once(__DIR__ . '/../objects/card.php');
-
-// use BgaVisibleSystemException;
-// use App\Objects\Card; // Ensure the Card class exists in the specified namespace
-// use Bga\Games\amenazaGigante\GiantData;
-// use const Bga\Games\amenazaGigante\GIANT_CARD_AREA;
-// use const Bga\Games\amenazaGigante\TRACK;
-// use const Bga\Games\amenazaGigante\GIANT_NEXT_PATH;
-
-function array_find(array $array, callable $fn)
-{
-    foreach ($array as $value) {
-        if ($fn($value)) {
-            return $value;
-        }
-    }
-    return null;
-}
-
-function array_find_key(array $array, callable $fn)
-{
-    foreach ($array as $key => $value) {
-        if ($fn($value)) {
-            return $key;
-        }
-    }
-    return null;
-}
+// function array_find_key(array $array, callable $fn)
+// {
+//     foreach ($array as $key => $value) {
+//         if ($fn($value)) {
+//             return $key;
+//         }
+//     }
+//     return null;
+// }
 
 function array_some(array $array, callable $fn)
 {
@@ -71,9 +60,6 @@ trait UtilsTrait
         if ($dbCard == null) {
             return null;
         }
-        // var_dump('PEPE');
-        // var_dump($dbCard);
-        // var_dump($this->CARDS);
         $cardType = $dbCard['card_type'];
         if ($cardType == "2") {
             return new GiantCard($dbCard, $this->CARDS);
@@ -134,12 +120,9 @@ trait UtilsTrait
         WHERE card_type = 1 
         AND card_type_arg IN ($inClause)";
 
-        // $cards = self::getObjectListFromDb($sql, $heroeCards);
         $cards = $this->getCollectionFromDb($sql);
-        // $this->dump("pepe", json_encode($cards));
 
         foreach ($cards as $card) {
-            // var_dump("pepe", json_encode($cards));
             $this->cards->moveCard($card['card_id'], TABLE_HEROE, $card['card_type_arg']);
         }
     }
@@ -157,7 +140,10 @@ trait UtilsTrait
         return count($cards) > 0 ? $cards[0] : null;
     }
 
-    function getCardsByLocation(string $location, ?int $location_arg = null, ?int $type = null, ?int $index = null)
+    /**
+     * @return (GiantCard|HeroCard)[]
+     */
+    function getCardsByLocation(string $location, ?int $location_arg = null, ?int $type = null, ?int $index = null): array
     {
         $sql = "SELECT * FROM `card` WHERE `card_location` = '$location'";
         if ($location_arg !== null) {
@@ -174,6 +160,15 @@ trait UtilsTrait
         return array_map(fn($dbCard) => $this->getCardFromDb($dbCard), array_values($dbResults));
     }
 
+    /**
+     * Sort cards by their image location. (typeArg)
+     * @return (GiantCard|HeroCard)[]
+     */
+    function sortCardsByImageLocation(array $cards): array {
+        usort($cards, fn($a, $b) => $a->getTypeArg() - $b->getTypeArg());
+        return $cards;
+    }
+
 
     // GIANT
 
@@ -187,11 +182,11 @@ trait UtilsTrait
         };
     }
 
-    public function advanceGiantPos()
+    public function advanceGiantPos(): int
     {
         $currentPos = $this->getGiantPos();
         $newPos = $currentPos + 1;
-        $this->setGameStateValue('giant_position_card', $newPos);
+        $this->setGiantPos($currentPos + 1);
         return (int) $newPos;
     }
 
@@ -226,6 +221,15 @@ trait UtilsTrait
         $this->setGameStateValue('giant_position_card', $giantPos);
     }
 
+    public function getSpecialGiantAction(): int
+    {
+        return (int) $this->getGameStateValue('giant_special_action'); 
+    }
+
+    public function setSpecialGiantAction(int $actionValue): void
+    {
+        $this->setGameStateValue('giant_special_action', $actionValue);
+    }
 
 
     public function getNextGiantAreaByGCard(int $gcard)
@@ -233,17 +237,23 @@ trait UtilsTrait
         return GIANT_NEXT_PATH[$gcard];
     }
 
-    public function getGiantPosArea()
+    // public function getGiantPosArea()
+    // {
+    //     return GIANT_CARD_AREA[(int) $this->getGameStateValue('giant_position_area')];
+    // }
+
+
+    public function getGiantPosArea(): int
     {
-        return GIANT_CARD_AREA[(int) $this->getGameStateValue('giant_position_area')];
+        return $this->getGameStateValue('giant_position_area');
     }
 
     // TRACKS
-    public function getGameTracksState()
+    public function getGameTracksState(): TrackState
     {
         $dbResults = $this->getObjectFromDB("SELECT * FROM generalTracks");
         if ($dbResults == null) {
-            return null;
+            throw new Exception("Error Processing Request getGameTracksState", 1);
         }
 
         return new TrackState($dbResults);
@@ -283,28 +293,30 @@ trait UtilsTrait
         }
 
         $sql = "UPDATE generalTracks SET " . implode(", ", $updates);
-        // var_dump('pepe sql', $sql);
         // Ejecutar la query con los parámetros
         $this->DbQuery($sql);
     }
 
-    public function checkEndGameCondition()
+    public function checkEndGameCondition(): bool
     {
         /** @var TrackState */
         $trackState = $this->getGameTracksState();
 
         if ($trackState->qualityMoral == 0) {
             $this->gamestate->nextState('end');
+            return true;
         }
         if ($trackState->cityDestruction == 1) {
             $this->gamestate->nextState('end');
+            return true;
         }
         if ($trackState->giantLife == 1) {
             $this->gamestate->nextState('end');
+            return true;
         }
 
         // TODO que pasa si se dan dos condiciones?
-        return;
+        return false;
     }
 
     public function getMaxValues()
@@ -322,7 +334,7 @@ trait UtilsTrait
     }
 
     // RONDELS
-    public function getRondelPosition()
+    public function getRondelManager()
     {
         $dbResults = $this->getCollectionFromDb("SELECT * FROM rondelPosition");
         if ($dbResults == null) {
@@ -334,7 +346,7 @@ trait UtilsTrait
 
     public function areThereRondelsEnabled()
     {
-        $rondels = $this->getRondelPosition();
+        $rondels = $this->getRondelManager();
 
         $hasEnabled = false;
 
@@ -356,10 +368,10 @@ trait UtilsTrait
 
     public function updateRondelMovement(RondelState $rondel)
     {
-        $enabled = intval($rondel->enabled);
-        $movement = intval($rondel->movement);
-        $location = intval($rondel->location);
-        $char = $rondel->char;
+        $enabled = intval($rondel->isAvailable());
+        $movement = $rondel->getMovement()->value;
+        $location = $rondel->getLocation()->value;
+        $char = $rondel->getChar()->value;
         $sql = "UPDATE rondelPosition 
             SET last_movement = $movement, 
                 rondel_location = $location, 

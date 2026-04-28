@@ -1,13 +1,11 @@
 class HeroeTableCenter {
   private heroeTableCards: LineStock<Card>;
-
+  private heroeCards: HeroeCard[];
   constructor(
     private game: AmenazaGiganteGame,
-    gamedatas: AmenazaGiganteGamedatas
+    pHeroeCards: HeroeCard[]
   ) {
-    console.log("HeroeTableCenter constructor", gamedatas);
-
-    const heroeCards: HeroeCard[] = gamedatas.heroeCards;
+    const heroeCards: HeroeCard[] = pHeroeCards;
 
     document.getElementById(`heroe-table-row`).insertAdjacentHTML(
       "beforeend",
@@ -22,8 +20,6 @@ class HeroeTableCenter {
             </div>
         `
     );
-
-
 
     this.heroeTableCards = new LineStock<Card>(
       this.game.cardsManager,

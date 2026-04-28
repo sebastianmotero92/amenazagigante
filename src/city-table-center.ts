@@ -1,10 +1,5 @@
 class CityTableCenter {
-  constructor(
-    private game: AmenazaGiganteGame,
-    gamedatas: AmenazaGiganteGamedatas
-  ) {
-    console.log("CityTableCenter constructor", gamedatas);
-
+  constructor() {
     document.getElementById(`city-table-row`).insertAdjacentHTML(
       "beforeend",
       `                

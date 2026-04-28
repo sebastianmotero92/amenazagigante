@@ -23,11 +23,17 @@
         font-size: 20pt;
         font-weight: bold;
         font-family: "Vinque-Regular";
-        text-shadow: 0 0 1px white, 0 0 2px white, 0 0 3px white;
+        text-shadow:
+          0 0 1px white,
+          0 0 2px white,
+          0 0 3px white;
 
         &[data-color="FFFFFF"],
         &[data-color="ffffff"] {
-          text-shadow: 0 0 1px black, 0 0 2px black, 0 0 3px black;
+          text-shadow:
+            0 0 1px black,
+            0 0 2px black,
+            0 0 3px black;
         }
       }
     }
@@ -73,28 +79,23 @@
 .hero-action {
   width: 26%;
   height: 13%;
-  /* background-color: #d8d6d6; */
-  /* border: 1px solid black; */
   border-radius: 90px;
-  /* opacity: 0.4; */
   position: absolute;
-  /* left: 40%; */
   pointer-events: auto;
 
   &.highlighted-action {
-    background-color: rgb(169, 169, 169);
-    border: 3px solid red;
-    border-radius: 5px;
-    cursor: pointer;
-    opacity: 0.5;
+    width: 19%;
+    border-radius: -1px;
+    opacity: 1;
     z-index: 10;
     pointer-events: auto;
+    outline: 5px dotted red;
+    cursor: pointer;
+    animation: glowNut 0.8s infinite alternate;
   }
 
   &.available-nut {
     background-color: rgb(169, 169, 169);
-    // border: 3px solid red;
-    // border-radius: 5px;
     opacity: 0.5;
     cursor: pointer;
     z-index: 10;
@@ -102,20 +103,165 @@
   }
 }
 
-/* .hero-action.action1 { top: 17px; left: 88px; } */
-.hero-action.action1 {
+// .card-side {
+//     box-shadow: unset;
+// }
+// .nut.blink {
+//   animation: glowNut 0.8s infinite alternate;
+// }
+
+.selectable-nut {
+  // outline: 4px dashed red;
+  cursor: pointer;
+
+   &.selectable-nut:not(.disabled-nut) {
+    &:not(.selected-nut) {
+      animation: glowNut 0.8s infinite alternate;
+      // selectable-card-animation 1s alternate infinite ease-in-out;
+    }
+  }
+}
+
+@keyframes glowNut {
+  from {
+    filter: drop-shadow(0 0 2px #ff0);
+  }
+  to {
+    filter: drop-shadow(0 0 8px #ff0);
+  }
+}
+
+.selected-nut {
+  // outline: 3px solid green;
+  // outline-offset: 3px;
+  animation: selectedPulse 1.2s infinite ease-in-out;
+}
+
+@keyframes selectedPulse {
+  0% { transform: scale(1); filter: drop-shadow(0 0 4px #0f0); }
+  50% { transform: scale(1.07); filter: drop-shadow(0 0 10px #0f0); }
+  100% { transform: scale(1); filter: drop-shadow(0 0 4px #0f0); }
+}
+
+.disabled-nut {
+}
+
+.selectable-nut {
+}
+
+.hero-action.action[data-pos="1"] {
   top: 3%;
   left: 37%;
 }
-.hero-action.action2 {
+.hero-action.action[data-pos="2"] {
   top: 10.5%;
   left: 61.5%;
 }
-.hero-action.action3 {
+.hero-action.action[data-pos="3"] {
   top: 28%;
   left: 71.5%;
 }
-.hero-action.action4 {
+.hero-action.action[data-pos="4"] {
+  top: 45%;
+  left: 61.5%;
+}
+.hero-action.action[data-pos="5"] {
+  top: 52.5%;
+  left: 37%;
+}
+.hero-action.action[data-pos="6"] {
+  top: 45%;
+  left: 12%;
+}
+.hero-action.action[data-pos="7"] {
+  top: 27.5%;
+  left: 2.5%;
+}
+.hero-action.action[data-pos="8"] {
+  top: 10.5%;
+  left: 12.5%;
+}
+
+.hero-action.action-highlight[data-pos="1"] {
+  top: 4%;
+  left: 39%;
+}
+.hero-action.action-highlight[data-pos="2"] {
+  top: 12.5%;
+  left: 64%;
+}
+.hero-action.action-highlight[data-pos="3"] {
+  top: 29.5%;
+  left: 73%;
+}
+.hero-action.action-highlight[data-pos="4"] {
+  top: 46%;
+  left: 63.5%;
+}
+.hero-action.action-highlight[data-pos="5"] {
+  top: 53.5%;
+  left: 38%;
+}
+.hero-action.action-highlight[data-pos="6"] {
+  top: 47%;
+  left: 14%;
+}
+.hero-action.action-highlight[data-pos="7"] {
+  top: 28.5%;
+  left: 3.5%;
+}
+.hero-action.action-highlight[data-pos="8"] {
+  top: 12%;
+  left: 15%;
+}
+
+/* .hero-action.action1 { top: 17px; left: 88px; } */
+// .hero-action.action1 {
+//   top: 3%;
+//   left: 37%;
+// }
+// .hero-action.action2 {
+//   top: 10.5%;
+//   left: 61.5%;
+// }
+// .hero-action.action3 {
+//   top: 28%;
+//   left: 71.5%;
+// }
+// .hero-action.action4 {
+//   top: 45%;
+//   left: 61.5%;
+// }
+// .hero-action.action5 {
+//   top: 52.5%;
+//   left: 37%;
+// }
+// .hero-action.action6 {
+//   top: 45%;
+//   left: 12%;
+// }
+// .hero-action.action7 {
+//   top: 27.5%;
+//   left: 2.5%;
+// }
+// .hero-action.action8 {
+//   top: 10.5%;
+//   left: 12.5%;
+// }
+
+.hero-action.actionhighlighted1 {
+  top: 3%;
+  left: 37%;
+}
+.hero-action.actionhighlighted2 {
+  top: 10.5%;
+  left: 61.5%;
+}
+.hero-action.actionhighlighted3 {
+  top: 28%;
+  left: 71.5%;
+}
+.hero-action.actionhighlighted4 {
   top: 45%;
   left: 61.5%;
 }
@@ -123,15 +269,15 @@
   top: 52.5%;
   left: 37%;
 }
-.hero-action.action6 {
+.hero-action.actionhighlighted6 {
   top: 45%;
   left: 12%;
 }
-.hero-action.action7 {
+.hero-action.actionhighlighted7 {
   top: 27.5%;
   left: 2.5%;
 }
-.hero-action.action8 {
+.hero-action.actionhighlighted8 {
   top: 10.5%;
   left: 12.5%;
 }

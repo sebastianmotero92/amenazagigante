@@ -85,13 +85,15 @@ class GiantCardType
 
 class HeroeCardType
 {
-    public string $name; // G1
+    public string $name; 
+    public string $cardNumber; // H1
     /** @var HeroeActions[] */
-    public HeroeActions $actions; // array GiantCardSection (3)
+    public HeroeActions $actions; // array HeroActions
 
-    public function __construct(string $name, HeroeActions $actions)
+    public function __construct(string $name, int $cardNumber, HeroeActions $actions)
     {
         $this->name = $name;
+        $this->cardNumber = 'H' . $cardNumber;
         $this->actions = $actions;
     }
 }
@@ -138,6 +140,11 @@ class Card
     {
         return array_map(fn($card) => self::onlyId($card), $cards);
     }
+
+    public function getTypeArg(): int
+    {
+        return $this->typeArg;
+    }
 }
 
 class HeroCard extends Card
@@ -183,7 +190,8 @@ class GiantCard extends Card
         $actions = $this->sections[$sector];
         if ($mandatory) {
             // check action slot length
-            return (count($actions->mandatory->actions) > 0) ? 1 : 0;
+            return count($actions->mandatory->actions);
+            // return (count($actions->mandatory->actions) > 0) ? 1 : 0;
         } else {
             // check amount of action slots
             return count($actions->optional);
@@ -222,14 +230,12 @@ class GiantCard extends Card
         return array_some($slot->actions, fn($action) => $action->track == 9);
     }
 
-    public function getSpecialAction(GiantCardSlot $slot) {
-        // var_dump($slot);
-
-        foreach ($slot->actions as $action) {
-            var_dump($action->track == 9);
+    public function getSpecialAction(GiantCardSlot $slot): ?GiantAction {
+        /** @var int|null */
+        $index = array_find_key($slot->actions, fn($action) => $action->track == 9);
+        if ($index === null) {
+            return null;
         }
-
-        $pe = array_find_key($slot->actions, fn($action) => $action->track == 9);
-        var_dump($pe);
+        return $slot->actions[$index];
     }
 }

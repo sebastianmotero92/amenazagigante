@@ -23,7 +23,17 @@
 $this->CARDS = [
   // 1 -> Heroe cards
   1 => [
-    1 => new HeroeCardType('H1', new HeroeActions([
+    1 => new HeroeCardType('Victor Oxin', 1, new HeroeActions([
+      new HeroeAction(4,1),
+      new HeroeAction(3,1),
+      new HeroeAction(7,1),
+      new HeroeAction(2,2),
+      new HeroeAction(4,1),
+      new HeroeAction(8,1),
+      new HeroeAction(1,1),
+      new HeroeAction(2,2)
+    ])),
+    2 => new HeroeCardType('Brainhelsing', 2, new HeroeActions([
       new HeroeAction(4,1),
       new HeroeAction(3,1),
       new HeroeAction(7,1),
@@ -33,17 +43,7 @@ $this->CARDS = [
       new HeroeAction(1,1),
       new HeroeAction(3,2)
     ])),
-    2 => new HeroeCardType('H2', new HeroeActions([
-      new HeroeAction(4,1),
-      new HeroeAction(3,1),
-      new HeroeAction(7,1),
-      new HeroeAction(2,2),
-      new HeroeAction(4,1),
-      new HeroeAction(8,1),
-      new HeroeAction(1,1),
-      new HeroeAction(3,2)
-    ])),
-    3 => new HeroeCardType('H3', new HeroeActions([
+    3 => new HeroeCardType('Ursula Ramsbottom', 3, new HeroeActions([
       new HeroeAction(4,1),
       new HeroeAction(3,1),
       new HeroeAction(7,1),
@@ -53,7 +53,7 @@ $this->CARDS = [
       new HeroeAction(1,1),
       new HeroeAction(3,2)
     ])),
-    4 => new HeroeCardType('H4', new HeroeActions([
+    4 => new HeroeCardType('Wang Fi Xalot', 4, new HeroeActions([
       new HeroeAction(4,1),
       new HeroeAction(3,1),
       new HeroeAction(3,2),
@@ -63,7 +63,7 @@ $this->CARDS = [
       new HeroeAction(8,1),
       new HeroeAction(3,2)
     ])),
-    5 => new HeroeCardType('H5', new HeroeActions([
+    5 => new HeroeCardType('Henry 807', 5, new HeroeActions([
       new HeroeAction(2,2),
       new HeroeAction(8,1),
       new HeroeAction(2,1),
@@ -73,7 +73,7 @@ $this->CARDS = [
       new HeroeAction(3,2),
       new HeroeAction(8,1)
     ])),
-    6 => new HeroeCardType('H6', new HeroeActions([
+    6 => new HeroeCardType('Rufina Gunn', 6, new HeroeActions([
       new HeroeAction(4,1),
       new HeroeAction(2,1),
       new HeroeAction(2,2),
@@ -83,7 +83,7 @@ $this->CARDS = [
       new HeroeAction(8,1),
       new HeroeAction(2,2)
     ])),
-    7 => new HeroeCardType('H7', new HeroeActions([
+    7 => new HeroeCardType('Petronella Canning', 7, new HeroeActions([
       new HeroeAction(4,1),
       new HeroeAction(5,1),
       new HeroeAction(1,1),
@@ -93,7 +93,7 @@ $this->CARDS = [
       new HeroeAction(2,1),
       new HeroeAction(8,1)
     ])),
-    8 => new HeroeCardType('H8', new HeroeActions([
+    8 => new HeroeCardType('Doctor Braun', 8, new HeroeActions([
       new HeroeAction(4,1),
       new HeroeAction(5,1),
       new HeroeAction(1,1),
@@ -103,7 +103,7 @@ $this->CARDS = [
       new HeroeAction(2,1),
       new HeroeAction(8,1)
     ])),
-    9 => new HeroeCardType('H9', new HeroeActions([
+    9 => new HeroeCardType('Igor Clocktower', 9, new HeroeActions([
       new HeroeAction(4,1),
       new HeroeAction(5,1),
       new HeroeAction(8,1),

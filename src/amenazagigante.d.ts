@@ -1,23 +1,28 @@
 /**
  * Your game interfaces
  */
+type TRondelLocation = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8;
+type TRondelMovement = 0 | 1 | 2 | 3;
+type TRondelChar = 'A' | 'B' | 'C'
 
-interface AmenazaGigantePlayer extends Player {
-//     cards: Card[];
-}
+type TGiantPosition = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9;
+type TGiantArea = 0 | 1 | 2;
+type TGiantAreaName = 'top' | 'middle' | 'bottom';
+type TGiantSpecialAction = 1 | 2 | 3;
+
+interface AmenazaGigantePlayer extends Player {}
 
 interface Rondel {
-    char: 'A' | 'B' | 'C';
+    char: TRondelChar;
     enabled: boolean;
     heroe: number;
-    id: number;
-    location: number;
-    movement: number;
+    location: TRondelLocation;
+    movement: TRondelMovement;
 }
 
 interface Rondels {
     rondels: Rondel[];
-    availableMovements: number[];
+    availableMovements: TRondelMovement[];
 }
 
 interface TrackState {
@@ -38,8 +43,12 @@ interface AmenazaGiganteGamedatas extends Gamedatas<AmenazaGigantePlayer> {
     trackState: TrackState;
     rondels: Rondels;
 
-    giantPosition: number;
-    giantArea: string;
+    giantData: GiantData;
+    heroData: HeroData;
+    cityData: CityData;
+
+    giantPosition: TGiantPosition;
+    giantArea: TGiantArea;
 }
 
 interface AmenazaGiganteGame extends Game {
@@ -53,39 +62,114 @@ interface AmenazaGiganteGame extends Game {
     onGiantTableCardClick: any;
     onHeroeActionCardClick: any
     onSpecialGiantActionClick: any;
+    addCancelButton: any
+    playSelectedHeroes: any;
 
     slideToObject: any
     bgaPlayDojoAnimation: any
 }
 
-// STATES
-interface EnteringGiantMandatoryMove {
-    giantArea: string;
-    giantCards: GiantCard[];
-    giantPosition: number;
-    tracks: any;
+type StateArgsMap = {
+    heroSelection: ArgsHeroSelection;
+    giantMandatoryMove: ArgsGiantMandatoryMove;
+    giantOptionalMove: ArgsGiantOptionalMove;
+    giantSpecialAction: ArgsGiantSpecialAction;
+    heroPhase: ArgsHeroePhase;
+};
+
+type AnyStateArgs = StateArgsMap[keyof StateArgsMap];
+
+// ARGS
+interface ArgsHeroSelection {
+    heroCards: HeroeCard[]; // the hero cards sorted by their image location.
 }
 
-interface EnteringGiantOptionalMove {
-    giantArea: string;
-    giantCards: GiantCard[];
-    giantPosition: number;
-    tracks: any;
+interface ArgsGiantMandatoryMove {
+    giantData: GiantData;
+    cityData: CityData;
 }
 
-interface EnteringHeroePhase {
-    // rondels: Rondel[];
+interface GiantData {
+    giantPosition: TGiantPosition;
+    giantArea: TGiantArea;
+    giantCards: GiantCard[];
+}
+
+interface HeroData {
+    heroCards: HeroeCard[];
     rondels: Rondels;
 }
+
+interface CityData {
+    track: TrackState
+}
+
+interface GameData {
+    heroData: HeroData;
+    giantData: GiantData;
+    cityData: CityData;
+}
+
+interface ArgsGiantOptionalMove {
+    giantPosition: TGiantPosition;
+    giantArea: TGiantArea;
+    giantCards: GiantCard[];
+    tracks: TrackState;
+}
+
+interface ArgsGiantSpecialAction {
+    specialGiantAction: TGiantSpecialAction
+}
+
+interface ArgsHeroePhase {
+    rondels: Rondels;
+}
+
+// STATES
+type EnteringHeroSelection = ArgsHeroSelection;
+type EnteringGiantMandatoryMove = ArgsGiantMandatoryMove;
+type EnteringGiantOptionalMove = ArgsGiantOptionalMove;
+type EnteringGiantSpecialAction = ArgsGiantSpecialAction;
+type EnteringHeroePhase = ArgsHeroePhase;
 
 // NOTIFICATIONS
 interface NotifGiantActionArgs {
     track: TrackState
+    cityData: CityData;
+}
+
+interface NotifSpecialActionDone {
+    specialGiantAction: TGiantSpecialAction;
+    rondels: Rondels;
 }
 
 interface NotifHeroeActionArgs {
-    movement: number;
-    newLocation: number;
-    rondelChar: 'A' | 'B' | 'C'
+    movement: TRondelMovement;
+    newLocation: TRondelLocation;
+    rondelChar: TRondelChar
     track: TrackState
+}
+
+interface NotifSpecialGiantAction {
+    specialGiantAction: TGiantSpecialAction
+}
+
+interface NotifVerificationPhase {
+    track: TrackState
+}
+
+interface NotifNewGiantCard {
+    heroData: HeroData;
+    giantData: GiantData;
+    cityData: CityData;
+    firstTurn: boolean
+}
+
+interface NotifHeroesSelected {
+    // track: TrackState;
+    // giantCards: GiantCard[];
+    heroData: HeroData;
+    // rondels: Rondels;
+    // giantPosition: TGiantPosition;
+    // giantArea: TGiantArea;
 }

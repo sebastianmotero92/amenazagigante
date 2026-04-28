@@ -1,17 +1,31 @@
 const LOCAL_STORAGE_ZOOM_KEY = "AmenazaGigante-zoom";
 
 // @ts-ignore
+const gameState = {
+  heroSelection: "heroSelection",
+  initGiantTurn: "initGiantTurn",
+  giantMandatoryMove: "giantMandatoryMove",
+  giantPlayerChoice: "giantPlayerChoice",
+  giantSpecialAction: "giantSpecialAction",
+  heroPhase: "heroPhase"
+};
+
+const actName = {
+  selectHeroes: "actSelectHeroes",
+  executeMandatoryAction: "actExecuteMandatoryAction",
+  executeOptionalAction: "actExecuteOptionalAction",
+  executeSpecialSwitchAction: "actExecuteSpecialSwitchAction",
+  executeSpecialMoveAction: "actExecuteSpecialMoveAction"
+};
+
+// @ts-ignore
 GameGui = (function () {
   // this hack required so we fake extend GameGui
   function GameGui() {}
   return GameGui;
 })();
 
-// class AmenazaGigante<AmenazaGiganteGamedatas> extends GameGui {
-class AmenazaGigante
-  extends GameGui<AmenazaGiganteGamedatas>
-  implements AmenazaGiganteGame
-{
+class AmenazaGigante extends GameGui<AmenazaGiganteGamedatas> implements AmenazaGiganteGame {
   public cardsManager: CardsManager;
   public animationManager: AnimationManager;
   public trackManager: TrackManager;
@@ -20,69 +34,88 @@ class AmenazaGigante
   public gamedatas: AmenazaGiganteGamedatas;
   // @ts-ignore
   private zoomManager: BgaZoom.Manager;
-  // private tableCenter: TableCenter;
 
   private giantTableCenter: GiantTableCenter;
   private heroeTableCenter: HeroeTableCenter;
   private cityTableCenter: CityTableCenter;
+  private setupHeroTableCenter: SetupHeroTableCenter;
+
+  private currentGameState: string;
 
   constructor() {
     super();
   }
 
-  public setup(gamedatas: AmenazaGiganteGamedatas): void {
-    console.log("Starting game setup 1");
+  public setup(gamedatas: AmenazaGiganteGamedatas) {
+    console.log(`Starting game setup ${new Date().toISOString()}`);
+
     this.gamedatas = gamedatas;
-    console.log(this.gamedatas);
+
+    console.log("gamedatas", this.gamedatas);
+    console.log("setup args", this.gamedatas.gamestate.args);
+    const args: AnyStateArgs = this.gamedatas.gamestate.args;
+
+    this.cardsManager = new CardsManager(this);
+    this.animationManager = new AnimationManager(this);
+
+    this.currentGameState = this.gamedatas.gamestate.name;
 
     this.getGameAreaElement().insertAdjacentHTML(
       "beforeend",
       `
-            <div id="full-table">
-                <div id="centered-table">
-                    <div id="giant-table-center">
-                        <div id="giant-table-row"></div>
-                    </div>
-                    <div id="heroe-table-center">
-                        <div id="heroe-table-row"></div>
-                    </div>
-                    <div id="city-table-center">
-                        <div id="city-table-row"></div>
-                    </div>
-                </div>
-            </div>
-        `
+      <div id="full-table">
+        <div id="centered-table">
+          <div id="giant-table-center">
+            <div id="giant-table-row"></div>
+          </div>
+          <div id="heroe-table-center">
+            <div id="heroe-table-row"></div>
+          </div>
+          <div id="city-table-center">
+            <div id="city-table-row"></div>
+          </div>
+        </div>
+      </div>
+    `
     );
 
-    this.cardsManager = new CardsManager(this);
-    this.animationManager = new AnimationManager(this);
-    this.trackManager = new TrackManager(this);
-    this.heroeManager = new HeroeManager(this);
-    this.giantManager = new GiantManager(this);
+    this.cityTableCenter = new CityTableCenter();
+    this.trackManager = new TrackManager(gamedatas.cityData.track, this);
+    this.trackManager.setupTrack();
 
-    this.giantTableCenter = new GiantTableCenter(this, this.gamedatas);
-    this.heroeTableCenter = new HeroeTableCenter(this, this.gamedatas);
-    this.cityTableCenter = new CityTableCenter(this, this.gamedatas);
+    const { giantPosition, giantCards, giantArea } = gamedatas.giantData;
+    this.giantTableCenter = new GiantTableCenter(this, giantCards);
+    this.giantManager = new GiantManager(giantPosition, giantArea, giantCards, this);
+    this.giantManager.setupGiant();
+
+    if (this.currentGameState === gameState.heroSelection) {
+      console.log("Entering hero selection state SETUP");
+
+      document.getElementById("heroe-table-center").dataset.visible = "false";
+      this.setupHeroTableCenter = new SetupHeroTableCenter(this.cardsManager, args as ArgsHeroSelection);
+    } else {
+      console.log("Entering OTHERS state SETUP");
+      document.getElementById("heroe-table-center").dataset.visible = "true";
+
+      this.heroeTableCenter = new HeroeTableCenter(this, gamedatas.heroData.heroCards);
+      const { rondels, heroCards } = gamedatas.heroData;
+      this.heroeManager = new HeroeManager(this, heroCards, rondels.rondels, rondels.availableMovements, this.trackManager);
+      this.heroeManager.setupRondels();
+    }
 
     this.zoomManager = new BgaZoom.Manager({
       element: document.getElementById("full-table"),
       zoomControls: {
-        color: "white",
+        color: "white"
       },
       zoomLevels: [0.25, 0.375, 0.5, 0.625, 0.75, 0.875, 1, 1.25, 1.5, 1.75, 2],
       localStorageZoomKey: LOCAL_STORAGE_ZOOM_KEY,
       autoZoom: {
         expectedWidth: 880, // for the lines of cards of the table to fit
-        minZoomLevel: 0.5,
-      },
+        minZoomLevel: 0.5
+      }
     });
 
-    // TEST DELETE
-    // this.cardsManager.highlightHeroeActions(this.gamedatas.heroeCards[0]);
-
-    this.trackManager.setupTrack();
-    this.heroeManager.setupRondels();
-    // this.heroeManager.enableRondels();
     this.setupNotifications();
 
     console.log("Ending game setup");
@@ -92,16 +125,24 @@ class AmenazaGigante
     console.log("Entering state: " + stateName, args.args);
 
     switch (stateName) {
-      case "giantMandatoryMove":
-        this.onEnteringGiantMandatoryMove(args.args);
+      case gameState.heroSelection:
+        console.log("Entering heroSelection state: Do nothing");
         break;
-      case "giantPlayerChoice":
-        this.onEnteringGiantOptionalMove(args.args);
+      case gameState.initGiantTurn:
+        console.log("Entering initGiantTurn state: Do nothing");
         break;
-        case "giantSpecialAction":
-            this.onEnteringGiantSpecialAction(args.args);
-            break;
-      case "heroPhase":
+      case gameState.giantMandatoryMove:
+        console.log("Entering giantMandatoryMove state: highlight actions");
+        this.onEnteringGiantMandatoryMove();
+        break;
+      case gameState.giantPlayerChoice:
+        console.log("Entering giantPlayerChoice state: highlight actions");
+        this.onEnteringGiantOptionalMove();
+        break;
+      case gameState.giantSpecialAction:
+        this.onEnteringGiantSpecialAction(args.args);
+        break;
+      case gameState.heroPhase:
         this.onEnteringHeroePhase(args.args);
         break;
       default:
@@ -109,45 +150,25 @@ class AmenazaGigante
     }
   }
 
-  private onEnteringGiantOptionalMove(args: EnteringGiantOptionalMove) {
-    this.giantManager.highlightGiantActions(false);
-  }
-
-  private onEnteringHeroePhase(args: EnteringHeroePhase) {
-    console.log("onEnteringHeroePhase", args.rondels);
-    // TODO actualizar rondeles habilitados
-    // this.heroeManager.updateRondelState(args.rondels);
-    this.heroeManager.enableRondels();
-  }
-
-  private onEnteringGiantMandatoryMove(args: EnteringGiantMandatoryMove) {
-    console.log("onEnteringGiantMandatoryMove", args);
-    // TODO MOVE TO NOTIF PICK GIANT CARD
-    this.giantManager.updateGiant(
-      args.giantPosition,
-      args.giantArea,
-      args.giantCards
-    );
-    this.giantManager.highlightGiantActions(true);
-  }
-
-  private onEnteringGiantSpecialAction(args) {
-    console.log('onEnteringGiantSpecialAction');
-    this.heroeManager.enableRondels();
-  }
-
   public onLeavingState(stateName: string) {
     switch (stateName) {
-      case "giantMandatoryMove":
+      case gameState.heroSelection:
+        console.log("leaving heroSelection state: Do nothing");
+        // document.getElementById('heroe-table-center').dataset.visible = 'true';
+        break;
+      case gameState.initGiantTurn:
+        console.log("leaving initGiantTurn");
+        break;
+      case gameState.giantMandatoryMove:
         this.onLeavingGiantMandatoryMove();
         break;
-      case "giantPlayerChoice":
+      case gameState.giantPlayerChoice:
         this.onLeavingGiantOptionalMove();
         break;
-      case "giantSpecialAction":
+      case gameState.giantSpecialAction:
         this.onLeavingGiantSpecialAction();
         break;
-      case "heroPhase":
+      case gameState.heroPhase:
         this.onLeavingHeroePhase();
         break;
       default:
@@ -155,30 +176,89 @@ class AmenazaGigante
     }
   }
 
-  private onLeavingGiantSpecialAction() {
-    console.log('onLeavingGiantSpecialAction')
+  private onEnteringGiantMandatoryMove() {
+    console.log("onEnteringGiantMandatoryMove", this.giantManager);
+    this.giantManager.highlightMandatoryAction();
+  }
+
+  private onLeavingGiantMandatoryMove() {
+    this.giantManager.resetGiantActions();
+    // this.heroeManager.resetAll();
+  }
+
+  private onEnteringGiantOptionalMove() {
+    this.giantManager.highlightOptionalActions();
   }
 
   private onLeavingGiantOptionalMove() {
     this.giantManager.resetGiantActions();
   }
 
+  private onEnteringGiantSpecialAction(args: EnteringGiantSpecialAction) {
+    console.log("onEnteringGiantSpecialAction");
+    this.heroeManager.initGiantPhase(args.specialGiantAction);
+    // this.heroeManager.resetEnableRondels();
+    // this.heroeManager.enableRondels();
+  }
+
+  private onLeavingGiantSpecialAction() {
+    console.log("onLeavingGiantSpecialAction");
+    this.heroeManager.resetAll();
+  }
+
+  private onEnteringHeroePhase(args: EnteringHeroePhase) {
+    console.log("onEnteringHeroePhase", args.rondels);
+    this.heroeManager.initHeroPhase();
+    // TODO actualizar rondeles habilitados
+    // console.log(this.heroeManager);
+    // this.heroeManager.updateRondelState(args.rondels);
+    // this.heroeManager.enableRondels();
+  }
+
   private onLeavingHeroePhase() {
     this.heroeManager.resetAll();
   }
 
-  private onLeavingGiantMandatoryMove() {
-    this.giantManager.resetGiantActions();
-    this.heroeManager.resetAll();
-    // this.cardsManager.removeHighlighedtActions();
-  }
-
   public onUpdateActionButtons(stateName: string, args: any) {
+    console.log("onUpdateActionButtons");
+
+    switch (stateName) {
+      case gameState.heroSelection:
+        this.statusBar.addActionButton("Confirm Selection", () => {
+          const setup = this.setupHeroTableCenter;
+          if (!setup.allCardsSelected()) {
+            alert("Please select three cards before continue.");
+            return;
+          }
+
+          const selected = setup.getSelectedCards();
+          this.playSelectedHeroes({
+            cardA: selected.cardA,
+            cardB: selected.cardB,
+            cardC: selected.cardC
+          });
+        });
+        break;
+      case gameState.giantMandatoryMove:
+        break;
+
+      default:
+        break;
+    }
+
     this.statusBar.addActionButton("debug", () => {
       console.log(this.heroeManager);
       console.log(this.trackManager);
       console.log(this.giantManager);
+      // console.log(this.giantManager.placeGiantToken());
+
       // this.giantTableCenter.addNewCard();
+      const actName = "actSelectHeroes";
+      // this.bgaPerformAction(actName, {
+      //   cardA: '1',
+      //   cardB: '5',
+      //   cardC: '7'
+      // });
     });
   }
 
@@ -190,13 +270,13 @@ class AmenazaGigante
     console.log("onTableCardClick", sector);
   }
 
-  public onGiantTableCardClick(id: number, sector: Sector, index: number) {
+  public onGiantTableCardClick(id: number, sector: TGiantArea, index: number) {
     console.log(id, sector, index, this.gamedatas.gamestate.name);
     switch (this.gamedatas.gamestate.name) {
-      case "giantMandatoryMove":
+      case gameState.giantMandatoryMove:
         this.playGiantAction(id, sector, index, "actExecuteMandatoryAction");
         break;
-      case "giantPlayerChoice":
+      case gameState.giantPlayerChoice:
         console.log("aca");
         this.playGiantAction(id, sector, index, "actExecuteOptionalAction");
         break;
@@ -205,86 +285,131 @@ class AmenazaGigante
     }
   }
 
-  public onHeroeActionCardClick(
-    rondel: Rondel,
-    movement: number,
-    newLocation: number
-  ) {
+  public onHeroeActionCardClick(rondel: Rondel, movement: number, newLocation: number) {
     this.playHeroeAction(rondel, movement, newLocation);
   }
 
-  public onSpecialGiantActionClick(
-    rondels: Rondel[],
-    movement: number,
-    newLocation: number
-  ) {
-    console.log(rondels, movement, newLocation);
-    const rondelsParam = rondels.map(rondel => rondel.char);
-    this.playSpecialGiantAction(rondelsParam, movement, newLocation, "actExecuteSpecialAction")
-  }
+  public addCancelButton(rondelClicked: Rondel) {
+    const buttonId = "cancel_rondel_selected";
 
-  public playSpecialGiantAction(
-    rondels: string[],
-    movement: number,
-    newLocation: number,
-    actName: GameAction) {
-        this.bgaPerformAction(actName, {
-            rondels: rondels,
-            movement: movement,
-            newLocation: newLocation,
-          });
-  }
+    this.statusBar.addActionButton(buttonId, () => {
+      this.heroeManager.resetAll();
+      this.heroeManager.setSpecialGiantAction(2);
+      this.heroeManager.enableRondels();
 
-  public playGiantAction(
-    id: number,
-    sector: Sector,
-    index: number,
-    actName: GameAction
-  ) {
-    console.log(id, sector, index); // 18 'middle' 1
-    this.bgaPerformAction(actName, {
-      idCard: id,
-      sector: sector as string,
-      index: index,
+      this.statusBar.removeActionButtons();
     });
   }
 
-  public playHeroeAction(
-    rondel: Rondel,
-    movement: number,
-    newLocation: number
-  ) {
+  // public onCancelSwitchSeleccionClick() {
+  //   this.heroeManager.setSpecialGiantAction(args.specialGiantAction);
+  //   this.heroeManager.enableRondels();
+  // }
+
+  public onSpecialGiantActionClick(rondelsChar: string[], newLocation: number | null, actionType: GiantActionActive) {
+    console.log(rondelsChar, newLocation, actionType);
+
+    if (actionType === GiantActionActive.EXCHANGE_RONDEL) {
+      this.playSpecialGiantAction(
+        {
+          rondelChar1: rondelsChar[0],
+          rondelChar2: rondelsChar[1]
+        },
+        "actExecuteSpecialSwitchAction"
+      );
+    } else {
+      this.playSpecialGiantAction(
+        {
+          rondelChar: rondelsChar[0],
+          newLocation: newLocation
+        },
+        "actExecuteSpecialMoveAction"
+      );
+    }
+  }
+
+  public playSpecialGiantAction(params, actName: string) {
+    this.bgaPerformAction(actName, params);
+  }
+
+  public playGiantAction(id: number, sector: TGiantArea, index: number, actName: GameAction) {
+    console.log(id, sector, index, actName); // 18 'middle' 1
+    this.bgaPerformAction(actName, {
+      idCard: id,
+      sector: sector,
+      index: index
+    });
+  }
+
+  public playSelectedHeroes(payload) {
+    // send typeArg value
+    this.bgaPerformAction(actName.selectHeroes, {
+      cardA: payload.cardA,
+      cardB: payload.cardB,
+      cardC: payload.cardC
+    });
+  }
+
+  public playHeroeAction(rondel: Rondel, movement: number, newLocation: number) {
+    console.log("playHeroeAction");
     this.bgaPerformAction("actExecuteHeroesAction", {
       rondelChar: rondel.char,
       movement: movement,
-      newLocation: newLocation,
+      newLocation: newLocation
     });
   }
 
-  public notif_giantAction(args: NotifGiantActionArgs) {
+  public notif_specialActionDone(args: NotifSpecialActionDone) {
+    console.log("notif_specialActionDone", args);
+    // DRAW NUT NEW POSITIONS
+    args.rondels.rondels.forEach((rondel: Rondel) => {
+      this.heroeManager.updateRondel(rondel.char, rondel.location, 0);
+    });
+  }
+
+  public async notif_giantAction(args: NotifGiantActionArgs) {
     console.log("notif_giantAction", args);
-    this.trackManager.updateTokens(args.track);
+    await this.trackManager.updateTokens(args.cityData.track);
   }
 
-  public notif_heroeAction(args: NotifHeroeActionArgs) {
+  public async notif_heroeAction(args: NotifHeroeActionArgs) {
     console.log("notif_heroeAction", args);
-    this.trackManager.updateTokens(args.track);
-    this.heroeManager.updateRondel(
-      args.rondelChar,
-      args.newLocation,
-      args.movement
-    );
+    await this.trackManager.updateTokens(args.track);
+    this.heroeManager.updateRondel(args.rondelChar, args.newLocation, args.movement);
   }
 
-  public notif_newGiantCard(args: any) {
+  public notif_specialGiantAction(args: NotifSpecialGiantAction) {
+    console.log("notif_specialGiantAction", args);
+  }
+
+  public notif_verificationPhase(args: NotifVerificationPhase) {
+    console.log("notif_verificationPhase", args);
+    this.trackManager.updateTokens(args.track);
+  }
+
+  public async notif_newGiantCard(args: NotifNewGiantCard) {
     console.log("notif_newGiantCard", args);
+    console.log(this.gamedatas.gamestate);
+    // this.heroeManager.resetEnableRondels();
 
-    // reset movement
-    // TODO actualizar rondeles habilitados
-    this.heroeManager.resetEnableRondels();
+    const { giantCards, giantPosition, giantArea } = args.giantData;
+    console.log(giantCards);
+    await this.giantTableCenter.addNewCard(giantCards[giantCards.length - 1]);
+    this.giantManager.updateGiant(giantPosition, giantArea, giantCards);
+    this.giantManager.placeGiantToken();
+  }
 
-    this.giantTableCenter.addNewCard(
-      args.giantCards[args.giantCards.length - 1]
-    );
+  public notif_heroesSelected(args: NotifHeroesSelected) {
+    console.log("notif_heroesSelected", args);
+
+    const setup = this.setupHeroTableCenter;
+    setup.destroy();
+
+    document.getElementById("heroe-table-center").dataset.visible = "true";
+
+    this.heroeTableCenter = new HeroeTableCenter(this, args.heroData.heroCards);
+    const { rondels, heroCards } = args.heroData;
+    this.heroeManager = new HeroeManager(this, heroCards, rondels.rondels, rondels.availableMovements, this.trackManager);
+    this.heroeManager.setupRondels();
   }
 }

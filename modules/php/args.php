@@ -1,18 +1,5 @@
 <?php
 
-// namespace traits;
-// namespace traits;
-
-// require_once(__DIR__ . '/../utils/constants.inc.php');
-
-// require_once("modules/php/utils/constants.inc.php");
-// require_once("../utils/constants.inc.php");
-// require_once(__DIR__ . '../utils/constants.inc.php');
-// use Bga\Games\amenazaGigante;
-// use Bga\Games\amenazaGigante\GiantData;
-// use const Bga\Games\amenazaGigante\GIANT_CARD_AREA;
-// use App\Utils\UtilsTrait;
-
 trait ArgsTrait
 {
     // use UtilsTrait;
@@ -26,34 +13,71 @@ trait ArgsTrait
         game state.
     */
 
-    public function argGameEnd(): void
+    public function argGameEnd1(): void
     {
 
     }
 
+    // This function returns the hero cards sorted by their image location.
+    public function argHeroSelection(): array {
+        return [
+            'heroCards' => $this->sortCardsByImageLocation($this->getCardsByLocation(HEROES_DECK)),
+        ];
+    }
+
     public function argGiantMandatoryMove(): array
     {
+        /** 
+         * Returns args
+         * @var int
+         * @var int
+         * @var GiantCard[]
+         * @var TrackState
+         * */
         return [
-            'giantPosition' => $this->getGiantPos(),
-            'giantArea' => $this->getGiantPosArea(),
-            'giantCards' => $this->getCardsByLocation(TABLE_GIANT),
-            'tracks' => $this->getGameTracksState()
+            'giantData' => [
+                'giantCards' => $this->getCardsByLocation(TABLE_GIANT),
+                'giantPosition' => $this->getGiantPos(),
+                'giantArea' => $this->getGiantPosArea(),
+            ],
+            'cityData' => [
+                'track' => $this->getGameTracksState(),
+            ],
+        ];
+    }
+
+    public function argGiantSpecialAction(): array
+    {
+        return [
+            'specialGiantAction' => $this->getSpecialGiantAction()
         ];
     }
 
     public function argGiantPlayerChoice(): array
     {
+        /** 
+         * Returns args
+         * @var int
+         * @var int
+         * @var GiantCard[]
+         * @var TrackState
+         * */
         return [
-            'giantPosition' => $this->getGiantPos(),
-            'giantArea' => $this->getGiantPosArea(),
-            'giantCards' => $this->getCardsByLocation(TABLE_GIANT),
-            'tracks' => $this->getGameTracksState()
+            'giantData' => [
+                'giantCards' => $this->getCardsByLocation(TABLE_GIANT),
+                'giantPosition' => $this->getGiantPos(),
+                'giantArea' => $this->getGiantPosArea(),
+            ],
+            'cityData' => [
+                'track' => $this->getGameTracksState(),
+            ],
         ];
+        
     }
 
     public function argHeroPhase() {
         // $tracks = $this->getGameTracksState();
-        $rondels = ($this->getRondelPosition())->getRondelsInfo();
+        $rondels = ($this->getRondelManager())->getAllData();
         // $usedMovements = array_column($rondels, 'last_movement');
         // $usedMovements = array_filter($usedMovements); 
 

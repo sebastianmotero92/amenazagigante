@@ -1,0 +1,107 @@
+#setup-table-center {
+    display: flex;
+    justify-content: center;
+    align-items: center; 
+    flex-direction: column;
+    gap: 20px;
+    padding: 5px; 
+    min-width: 790px;
+
+    #setup-table-row {
+        background: #FFFFFF66;
+        padding: 15px;
+        border-radius: 15px;
+
+        .name-wrapper {
+            position: relative;
+            display: flex;
+            padding: 5px;
+            justify-content: center;
+            align-items: center;
+        
+            .name {
+              font-size: 20pt;
+              font-weight: bold;
+              font-family: 'Vinque-Regular';
+              text-shadow: 0 0 1px white, 0 0 2px white, 0 0 3px white;
+        
+              &[data-color="FFFFFF"], &[data-color="ffffff"] {
+                text-shadow: 0 0 1px black, 0 0 2px black, 0 0 3px black;
+              }
+            }
+          }
+
+        .setup-table-cards {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 20px;
+            max-width: 600px; 
+          }
+
+          #setup-table-cards .card.selected {
+  outline: 3px solid #3aa1ff;
+  border-radius: 8px;
+  transform: translateY(-6px);
+  transition: transform 120ms ease, outline-color 120ms ease;
+  z-index: 2;
+}
+
+/* optional: subtle hover effect */
+#setup-table-cards .card:hover {
+  transform: translateY(-4px);
+  transition: transform 120ms ease;
+}
+
+        // .setup-table-cards {
+        //     display: grid;
+        //     grid-template-columns: repeat(3, 1fr); // 3 columnas
+        //     gap: 20px;
+        //     max-width: 760px; // opcional: controla el ancho total del grid
+        //     width: 100%;
+        //     justify-items: center; // centra cada carta dentro de su celda
+        // }
+
+        // #setup-table-cards .card-stock.line-stock {
+        //   display: flex !important;
+        //   flex-wrap: wrap !important;
+        //   gap: 20px !important;
+        //   justify-content: center !important;
+        //   width: calc(3 * 220px + 2 * 20px) !important; /* asegura espacio para 3 cartas */
+        //   box-sizing: border-box !important;
+        // }
+
+        // #setup-table-cards .card-stock.line-stock .card {
+        //   flex: 0 0 220px !important; /* ancho fijo por carta */
+        //   width: 220px !important;
+        //   max-width: 220px !important;
+        //   box-sizing: border-box !important;
+        //   margin: 0 !important;
+        //   display: block !important;
+        // }
+        // /* Responsive: bajar a 2 o 1 columna según ancho */
+        // @media (max-width: 900px) {
+        //   #setup-table-cards .card-stock.line-stock {
+        //     width: calc(2 * 220px + 1 * 20px) !important;
+        //   }
+        //   #setup-table-cards .card-stock.line-stock .card {
+        //     flex: 0 0 220px !important;
+        //   }
+        // }
+
+        // @media (max-width: 480px) {
+        //   #setup-table-cards .card-stock.line-stock {
+        //     width: 220px !important;
+        //   }
+        //   #setup-table-cards .card-stock.line-stock .card {
+        //     flex: 0 0 220px !important;
+        //     width: 100% !important;
+        //   }
+        // }
+
+        &.hidden {
+            display: none;
+        }
+    }
+}
+

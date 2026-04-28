@@ -1,4 +1,4 @@
-#giant-table-center {
+#setup-table-center {
     display: flex;
     justify-content: center;
     align-items: center; 
@@ -7,7 +7,7 @@
     padding: 5px; 
     min-width: 790px;
 
-    #giant-table-row {
+    #setup-table-row {
         background: #FFFFFF66;
         padding: 15px;
         border-radius: 15px;
@@ -31,28 +31,11 @@
             }
           }
 
-        // .giant-table-cards {
-        //     display: grid;
-        //     grid-template-columns: auto auto auto auto auto auto auto auto auto;
-        //     gap: 20px;
-        //     align-items: center;
-        //     // width: 445px;
-        // }
-
-        .giant-table-cards {
+        .setup-table-cards {
             display: flex;
             flex-wrap: wrap;
             justify-content: center;
             gap: 20px;
-
-              .giantToken {
-                background-image: url('img/giant.png');
-                width: 100%;
-                aspect-ratio: 335 / 316;
-                background-size: cover;
-                border-radius: 10px;
-                max-width: 30%;
-              }
           }
 
         &.hidden {

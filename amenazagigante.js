@@ -13,129 +13,238 @@ var __extends = (this && this.__extends) || (function () {
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
     };
 })();
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+var __generator = (this && this.__generator) || function (thisArg, body) {
+    var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g = Object.create((typeof Iterator === "function" ? Iterator : Object).prototype);
+    return g.next = verb(0), g["throw"] = verb(1), g["return"] = verb(2), typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
+    function verb(n) { return function (v) { return step([n, v]); }; }
+    function step(op) {
+        if (f) throw new TypeError("Generator is already executing.");
+        while (g && (g = 0, op[0] && (_ = 0)), _) try {
+            if (f = 1, y && (t = op[0] & 2 ? y["return"] : op[0] ? y["throw"] || ((t = y["return"]) && t.call(y), 0) : y.next) && !(t = t.call(y, op[1])).done) return t;
+            if (y = 0, t) op = [op[0] & 2, t.value];
+            switch (op[0]) {
+                case 0: case 1: t = op; break;
+                case 4: _.label++; return { value: op[1], done: false };
+                case 5: _.label++; y = op[1]; op = [0]; continue;
+                case 7: op = _.ops.pop(); _.trys.pop(); continue;
+                default:
+                    if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) { _ = 0; continue; }
+                    if (op[0] === 3 && (!t || (op[1] > t[0] && op[1] < t[3]))) { _.label = op[1]; break; }
+                    if (op[0] === 6 && _.label < t[1]) { _.label = t[1]; t = op; break; }
+                    if (t && _.label < t[2]) { _.label = t[2]; _.ops.push(op); break; }
+                    if (t[2]) _.ops.pop();
+                    _.trys.pop(); continue;
+            }
+            op = body.call(thisArg, _);
+        } catch (e) { op = [6, e]; y = 0; } finally { f = t = 0; }
+        if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
+    }
+};
 var LOCAL_STORAGE_ZOOM_KEY = "AmenazaGigante-zoom";
+// @ts-ignore
+var gameState = {
+    heroSelection: "heroSelection",
+    initGiantTurn: "initGiantTurn",
+    giantMandatoryMove: "giantMandatoryMove",
+    giantPlayerChoice: "giantPlayerChoice",
+    giantSpecialAction: "giantSpecialAction",
+    heroPhase: "heroPhase"
+};
+var actName = {
+    selectHeroes: "actSelectHeroes",
+    executeMandatoryAction: "actExecuteMandatoryAction",
+    executeOptionalAction: "actExecuteOptionalAction",
+    executeSpecialSwitchAction: "actExecuteSpecialSwitchAction",
+    executeSpecialMoveAction: "actExecuteSpecialMoveAction"
+};
 // @ts-ignore
 GameGui = (function () {
     // this hack required so we fake extend GameGui
     function GameGui() { }
     return GameGui;
 })();
-// class AmenazaGigante<AmenazaGiganteGamedatas> extends GameGui {
 var AmenazaGigante = /** @class */ (function (_super) {
     __extends(AmenazaGigante, _super);
     function AmenazaGigante() {
         return _super.call(this) || this;
     }
     AmenazaGigante.prototype.setup = function (gamedatas) {
-        console.log("Starting game setup 1");
+        console.log("Starting game setup ".concat(new Date().toISOString()));
         this.gamedatas = gamedatas;
-        console.log(this.gamedatas);
-        this.getGameAreaElement().insertAdjacentHTML("beforeend", "\n            <div id=\"full-table\">\n                <div id=\"centered-table\">\n                    <div id=\"giant-table-center\">\n                        <div id=\"giant-table-row\"></div>\n                    </div>\n                    <div id=\"heroe-table-center\">\n                        <div id=\"heroe-table-row\"></div>\n                    </div>\n                    <div id=\"city-table-center\">\n                        <div id=\"city-table-row\"></div>\n                    </div>\n                </div>\n            </div>\n        ");
+        console.log("gamedatas", this.gamedatas);
+        console.log("setup args", this.gamedatas.gamestate.args);
+        var args = this.gamedatas.gamestate.args;
         this.cardsManager = new CardsManager(this);
         this.animationManager = new AnimationManager(this);
-        this.trackManager = new TrackManager(this);
-        this.heroeManager = new HeroeManager(this);
-        this.giantManager = new GiantManager(this);
-        this.giantTableCenter = new GiantTableCenter(this, this.gamedatas);
-        this.heroeTableCenter = new HeroeTableCenter(this, this.gamedatas);
-        this.cityTableCenter = new CityTableCenter(this, this.gamedatas);
+        this.currentGameState = this.gamedatas.gamestate.name;
+        this.getGameAreaElement().insertAdjacentHTML("beforeend", "\n      <div id=\"full-table\">\n        <div id=\"centered-table\">\n          <div id=\"giant-table-center\">\n            <div id=\"giant-table-row\"></div>\n          </div>\n          <div id=\"heroe-table-center\">\n            <div id=\"heroe-table-row\"></div>\n          </div>\n          <div id=\"city-table-center\">\n            <div id=\"city-table-row\"></div>\n          </div>\n        </div>\n      </div>\n    ");
+        this.cityTableCenter = new CityTableCenter();
+        this.trackManager = new TrackManager(gamedatas.cityData.track, this);
+        this.trackManager.setupTrack();
+        var _a = gamedatas.giantData, giantPosition = _a.giantPosition, giantCards = _a.giantCards, giantArea = _a.giantArea;
+        this.giantTableCenter = new GiantTableCenter(this, giantCards);
+        this.giantManager = new GiantManager(giantPosition, giantArea, giantCards, this);
+        this.giantManager.setupGiant();
+        if (this.currentGameState === gameState.heroSelection) {
+            console.log("Entering hero selection state SETUP");
+            document.getElementById("heroe-table-center").dataset.visible = "false";
+            this.setupHeroTableCenter = new SetupHeroTableCenter(this.cardsManager, args);
+        }
+        else {
+            console.log("Entering OTHERS state SETUP");
+            document.getElementById("heroe-table-center").dataset.visible = "true";
+            this.heroeTableCenter = new HeroeTableCenter(this, gamedatas.heroData.heroCards);
+            var _b = gamedatas.heroData, rondels = _b.rondels, heroCards = _b.heroCards;
+            this.heroeManager = new HeroeManager(this, heroCards, rondels.rondels, rondels.availableMovements, this.trackManager);
+            this.heroeManager.setupRondels();
+        }
         this.zoomManager = new BgaZoom.Manager({
             element: document.getElementById("full-table"),
             zoomControls: {
-                color: "white",
+                color: "white"
             },
             zoomLevels: [0.25, 0.375, 0.5, 0.625, 0.75, 0.875, 1, 1.25, 1.5, 1.75, 2],
             localStorageZoomKey: LOCAL_STORAGE_ZOOM_KEY,
             autoZoom: {
                 expectedWidth: 880, // for the lines of cards of the table to fit
-                minZoomLevel: 0.5,
-            },
+                minZoomLevel: 0.5
+            }
         });
-        // TEST DELETE
-        // this.cardsManager.highlightHeroeActions(this.gamedatas.heroeCards[0]);
-        this.trackManager.setupTrack();
-        this.heroeManager.setupRondels();
-        // this.heroeManager.enableRondels();
         this.setupNotifications();
         console.log("Ending game setup");
     };
     AmenazaGigante.prototype.onEnteringState = function (stateName, args) {
         console.log("Entering state: " + stateName, args.args);
         switch (stateName) {
-            case "giantMandatoryMove":
-                this.onEnteringGiantMandatoryMove(args.args);
+            case gameState.heroSelection:
+                console.log("Entering heroSelection state: Do nothing");
                 break;
-            case "giantPlayerChoice":
-                this.onEnteringGiantOptionalMove(args.args);
+            case gameState.initGiantTurn:
+                console.log("Entering initGiantTurn state: Do nothing");
                 break;
-            case "giantSpecialAction":
+            case gameState.giantMandatoryMove:
+                console.log("Entering giantMandatoryMove state: highlight actions");
+                this.onEnteringGiantMandatoryMove();
+                break;
+            case gameState.giantPlayerChoice:
+                console.log("Entering giantPlayerChoice state: highlight actions");
+                this.onEnteringGiantOptionalMove();
+                break;
+            case gameState.giantSpecialAction:
                 this.onEnteringGiantSpecialAction(args.args);
                 break;
-            case "heroPhase":
+            case gameState.heroPhase:
                 this.onEnteringHeroePhase(args.args);
                 break;
             default:
                 break;
         }
     };
-    AmenazaGigante.prototype.onEnteringGiantOptionalMove = function (args) {
-        this.giantManager.highlightGiantActions(false);
-    };
-    AmenazaGigante.prototype.onEnteringHeroePhase = function (args) {
-        console.log("onEnteringHeroePhase", args.rondels);
-        // TODO actualizar rondeles habilitados
-        // this.heroeManager.updateRondelState(args.rondels);
-        this.heroeManager.enableRondels();
-    };
-    AmenazaGigante.prototype.onEnteringGiantMandatoryMove = function (args) {
-        console.log("onEnteringGiantMandatoryMove", args);
-        // TODO MOVE TO NOTIF PICK GIANT CARD
-        this.giantManager.updateGiant(args.giantPosition, args.giantArea, args.giantCards);
-        this.giantManager.highlightGiantActions(true);
-    };
-    AmenazaGigante.prototype.onEnteringGiantSpecialAction = function (args) {
-        console.log('onEnteringGiantSpecialAction');
-        this.heroeManager.enableRondels();
-    };
     AmenazaGigante.prototype.onLeavingState = function (stateName) {
         switch (stateName) {
-            case "giantMandatoryMove":
+            case gameState.heroSelection:
+                console.log("leaving heroSelection state: Do nothing");
+                // document.getElementById('heroe-table-center').dataset.visible = 'true';
+                break;
+            case gameState.initGiantTurn:
+                console.log("leaving initGiantTurn");
+                break;
+            case gameState.giantMandatoryMove:
                 this.onLeavingGiantMandatoryMove();
                 break;
-            case "giantPlayerChoice":
+            case gameState.giantPlayerChoice:
                 this.onLeavingGiantOptionalMove();
                 break;
-            case "giantSpecialAction":
+            case gameState.giantSpecialAction:
                 this.onLeavingGiantSpecialAction();
                 break;
-            case "heroPhase":
+            case gameState.heroPhase:
                 this.onLeavingHeroePhase();
                 break;
             default:
                 break;
         }
     };
-    AmenazaGigante.prototype.onLeavingGiantSpecialAction = function () {
-        console.log('onLeavingGiantSpecialAction');
+    AmenazaGigante.prototype.onEnteringGiantMandatoryMove = function () {
+        console.log("onEnteringGiantMandatoryMove", this.giantManager);
+        this.giantManager.highlightMandatoryAction();
+    };
+    AmenazaGigante.prototype.onLeavingGiantMandatoryMove = function () {
+        this.giantManager.resetGiantActions();
+        // this.heroeManager.resetAll();
+    };
+    AmenazaGigante.prototype.onEnteringGiantOptionalMove = function () {
+        this.giantManager.highlightOptionalActions();
     };
     AmenazaGigante.prototype.onLeavingGiantOptionalMove = function () {
         this.giantManager.resetGiantActions();
     };
+    AmenazaGigante.prototype.onEnteringGiantSpecialAction = function (args) {
+        console.log("onEnteringGiantSpecialAction");
+        this.heroeManager.initGiantPhase(args.specialGiantAction);
+        // this.heroeManager.resetEnableRondels();
+        // this.heroeManager.enableRondels();
+    };
+    AmenazaGigante.prototype.onLeavingGiantSpecialAction = function () {
+        console.log("onLeavingGiantSpecialAction");
+        this.heroeManager.resetAll();
+    };
+    AmenazaGigante.prototype.onEnteringHeroePhase = function (args) {
+        console.log("onEnteringHeroePhase", args.rondels);
+        this.heroeManager.initHeroPhase();
+        // TODO actualizar rondeles habilitados
+        // console.log(this.heroeManager);
+        // this.heroeManager.updateRondelState(args.rondels);
+        // this.heroeManager.enableRondels();
+    };
     AmenazaGigante.prototype.onLeavingHeroePhase = function () {
         this.heroeManager.resetAll();
     };
-    AmenazaGigante.prototype.onLeavingGiantMandatoryMove = function () {
-        this.giantManager.resetGiantActions();
-        this.heroeManager.resetAll();
-        // this.cardsManager.removeHighlighedtActions();
-    };
     AmenazaGigante.prototype.onUpdateActionButtons = function (stateName, args) {
         var _this = this;
+        console.log("onUpdateActionButtons");
+        switch (stateName) {
+            case gameState.heroSelection:
+                this.statusBar.addActionButton("Confirm Selection", function () {
+                    var setup = _this.setupHeroTableCenter;
+                    if (!setup.allCardsSelected()) {
+                        alert("Please select three cards before continue.");
+                        return;
+                    }
+                    var selected = setup.getSelectedCards();
+                    _this.playSelectedHeroes({
+                        cardA: selected.cardA,
+                        cardB: selected.cardB,
+                        cardC: selected.cardC
+                    });
+                });
+                break;
+            case gameState.giantMandatoryMove:
+                break;
+            default:
+                break;
+        }
         this.statusBar.addActionButton("debug", function () {
             console.log(_this.heroeManager);
             console.log(_this.trackManager);
             console.log(_this.giantManager);
+            // console.log(this.giantManager.placeGiantToken());
             // this.giantTableCenter.addNewCard();
+            var actName = "actSelectHeroes";
+            // this.bgaPerformAction(actName, {
+            //   cardA: '1',
+            //   cardB: '5',
+            //   cardC: '7'
+            // });
         });
     };
     AmenazaGigante.prototype.setupNotifications = function () {
@@ -147,10 +256,10 @@ var AmenazaGigante = /** @class */ (function (_super) {
     AmenazaGigante.prototype.onGiantTableCardClick = function (id, sector, index) {
         console.log(id, sector, index, this.gamedatas.gamestate.name);
         switch (this.gamedatas.gamestate.name) {
-            case "giantMandatoryMove":
+            case gameState.giantMandatoryMove:
                 this.playGiantAction(id, sector, index, "actExecuteMandatoryAction");
                 break;
-            case "giantPlayerChoice":
+            case gameState.giantPlayerChoice:
                 console.log("aca");
                 this.playGiantAction(id, sector, index, "actExecuteOptionalAction");
                 break;
@@ -161,48 +270,135 @@ var AmenazaGigante = /** @class */ (function (_super) {
     AmenazaGigante.prototype.onHeroeActionCardClick = function (rondel, movement, newLocation) {
         this.playHeroeAction(rondel, movement, newLocation);
     };
-    AmenazaGigante.prototype.onSpecialGiantActionClick = function (rondels, movement, newLocation) {
-        console.log(rondels, movement, newLocation);
-        var rondelsParam = rondels.map(function (rondel) { return rondel.char; });
-        this.playSpecialGiantAction(rondelsParam, movement, newLocation, "actExecuteSpecialAction");
-    };
-    AmenazaGigante.prototype.playSpecialGiantAction = function (rondels, movement, newLocation, actName) {
-        this.bgaPerformAction(actName, {
-            rondels: rondels,
-            movement: movement,
-            newLocation: newLocation,
+    AmenazaGigante.prototype.addCancelButton = function (rondelClicked) {
+        var _this = this;
+        var buttonId = "cancel_rondel_selected";
+        this.statusBar.addActionButton(buttonId, function () {
+            _this.heroeManager.resetAll();
+            _this.heroeManager.setSpecialGiantAction(2);
+            _this.heroeManager.enableRondels();
+            _this.statusBar.removeActionButtons();
         });
     };
+    // public onCancelSwitchSeleccionClick() {
+    //   this.heroeManager.setSpecialGiantAction(args.specialGiantAction);
+    //   this.heroeManager.enableRondels();
+    // }
+    AmenazaGigante.prototype.onSpecialGiantActionClick = function (rondelsChar, newLocation, actionType) {
+        console.log(rondelsChar, newLocation, actionType);
+        if (actionType === GiantActionActive.EXCHANGE_RONDEL) {
+            this.playSpecialGiantAction({
+                rondelChar1: rondelsChar[0],
+                rondelChar2: rondelsChar[1]
+            }, "actExecuteSpecialSwitchAction");
+        }
+        else {
+            this.playSpecialGiantAction({
+                rondelChar: rondelsChar[0],
+                newLocation: newLocation
+            }, "actExecuteSpecialMoveAction");
+        }
+    };
+    AmenazaGigante.prototype.playSpecialGiantAction = function (params, actName) {
+        this.bgaPerformAction(actName, params);
+    };
     AmenazaGigante.prototype.playGiantAction = function (id, sector, index, actName) {
-        console.log(id, sector, index); // 18 'middle' 1
+        console.log(id, sector, index, actName); // 18 'middle' 1
         this.bgaPerformAction(actName, {
             idCard: id,
             sector: sector,
-            index: index,
+            index: index
+        });
+    };
+    AmenazaGigante.prototype.playSelectedHeroes = function (payload) {
+        // send typeArg value
+        this.bgaPerformAction(actName.selectHeroes, {
+            cardA: payload.cardA,
+            cardB: payload.cardB,
+            cardC: payload.cardC
         });
     };
     AmenazaGigante.prototype.playHeroeAction = function (rondel, movement, newLocation) {
+        console.log("playHeroeAction");
         this.bgaPerformAction("actExecuteHeroesAction", {
             rondelChar: rondel.char,
             movement: movement,
-            newLocation: newLocation,
+            newLocation: newLocation
+        });
+    };
+    AmenazaGigante.prototype.notif_specialActionDone = function (args) {
+        var _this = this;
+        console.log("notif_specialActionDone", args);
+        // DRAW NUT NEW POSITIONS
+        args.rondels.rondels.forEach(function (rondel) {
+            _this.heroeManager.updateRondel(rondel.char, rondel.location, 0);
         });
     };
     AmenazaGigante.prototype.notif_giantAction = function (args) {
-        console.log("notif_giantAction", args);
-        this.trackManager.updateTokens(args.track);
+        return __awaiter(this, void 0, void 0, function () {
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        console.log("notif_giantAction", args);
+                        return [4 /*yield*/, this.trackManager.updateTokens(args.cityData.track)];
+                    case 1:
+                        _a.sent();
+                        return [2 /*return*/];
+                }
+            });
+        });
     };
     AmenazaGigante.prototype.notif_heroeAction = function (args) {
-        console.log("notif_heroeAction", args);
+        return __awaiter(this, void 0, void 0, function () {
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        console.log("notif_heroeAction", args);
+                        return [4 /*yield*/, this.trackManager.updateTokens(args.track)];
+                    case 1:
+                        _a.sent();
+                        this.heroeManager.updateRondel(args.rondelChar, args.newLocation, args.movement);
+                        return [2 /*return*/];
+                }
+            });
+        });
+    };
+    AmenazaGigante.prototype.notif_specialGiantAction = function (args) {
+        console.log("notif_specialGiantAction", args);
+    };
+    AmenazaGigante.prototype.notif_verificationPhase = function (args) {
+        console.log("notif_verificationPhase", args);
         this.trackManager.updateTokens(args.track);
-        this.heroeManager.updateRondel(args.rondelChar, args.newLocation, args.movement);
     };
     AmenazaGigante.prototype.notif_newGiantCard = function (args) {
-        console.log("notif_newGiantCard", args);
-        // reset movement
-        // TODO actualizar rondeles habilitados
-        this.heroeManager.resetEnableRondels();
-        this.giantTableCenter.addNewCard(args.giantCards[args.giantCards.length - 1]);
+        return __awaiter(this, void 0, void 0, function () {
+            var _a, giantCards, giantPosition, giantArea;
+            return __generator(this, function (_b) {
+                switch (_b.label) {
+                    case 0:
+                        console.log("notif_newGiantCard", args);
+                        console.log(this.gamedatas.gamestate);
+                        _a = args.giantData, giantCards = _a.giantCards, giantPosition = _a.giantPosition, giantArea = _a.giantArea;
+                        console.log(giantCards);
+                        return [4 /*yield*/, this.giantTableCenter.addNewCard(giantCards[giantCards.length - 1])];
+                    case 1:
+                        _b.sent();
+                        this.giantManager.updateGiant(giantPosition, giantArea, giantCards);
+                        this.giantManager.placeGiantToken();
+                        return [2 /*return*/];
+                }
+            });
+        });
+    };
+    AmenazaGigante.prototype.notif_heroesSelected = function (args) {
+        console.log("notif_heroesSelected", args);
+        var setup = this.setupHeroTableCenter;
+        setup.destroy();
+        document.getElementById("heroe-table-center").dataset.visible = "true";
+        this.heroeTableCenter = new HeroeTableCenter(this, args.heroData.heroCards);
+        var _a = args.heroData, rondels = _a.rondels, heroCards = _a.heroCards;
+        this.heroeManager = new HeroeManager(this, heroCards, rondels.rondels, rondels.availableMovements, this.trackManager);
+        this.heroeManager.setupRondels();
     };
     return AmenazaGigante;
 }(GameGui));
@@ -532,42 +728,6 @@ var __assign = (this && this.__assign) || function () {
         return t;
     };
     return __assign.apply(this, arguments);
-};
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
-var __generator = (this && this.__generator) || function (thisArg, body) {
-    var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g = Object.create((typeof Iterator === "function" ? Iterator : Object).prototype);
-    return g.next = verb(0), g["throw"] = verb(1), g["return"] = verb(2), typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
-    function verb(n) { return function (v) { return step([n, v]); }; }
-    function step(op) {
-        if (f) throw new TypeError("Generator is already executing.");
-        while (g && (g = 0, op[0] && (_ = 0)), _) try {
-            if (f = 1, y && (t = op[0] & 2 ? y["return"] : op[0] ? y["throw"] || ((t = y["return"]) && t.call(y), 0) : y.next) && !(t = t.call(y, op[1])).done) return t;
-            if (y = 0, t) op = [op[0] & 2, t.value];
-            switch (op[0]) {
-                case 0: case 1: t = op; break;
-                case 4: _.label++; return { value: op[1], done: false };
-                case 5: _.label++; y = op[1]; op = [0]; continue;
-                case 7: op = _.ops.pop(); _.trys.pop(); continue;
-                default:
-                    if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) { _ = 0; continue; }
-                    if (op[0] === 3 && (!t || (op[1] > t[0] && op[1] < t[3]))) { _.label = op[1]; break; }
-                    if (op[0] === 6 && _.label < t[1]) { _.label = t[1]; t = op; break; }
-                    if (t && _.label < t[2]) { _.label = t[2]; _.ops.push(op); break; }
-                    if (t[2]) _.ops.pop();
-                    _.trys.pop(); continue;
-            }
-            op = body.call(thisArg, _);
-        } catch (e) { op = [6, e]; y = 0; } finally { f = t = 0; }
-        if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
-    }
 };
 var __spreadArray = (this && this.__spreadArray) || function (to, from, pack) {
     if (pack || arguments.length === 2) for (var i = 0, l = from.length, ar; i < l; i++) {
@@ -2117,21 +2277,19 @@ var CardsManager = /** @class */ (function (_super) {
             setupDiv: function (card, div) {
                 div.dataset.cardId = "" + card.id;
                 div.dataset.type = "" + card.type;
+                div.dataset.typeArg = "" + card.typeArg;
             },
-            setupFrontDiv: function (card, div) {
-                return _this.setupFrontDiv(card, div);
-            },
+            setupFrontDiv: function (card, div) { return _this.setupFrontDiv(card, div); },
             isCardVisible: function (card) { return !card.flipped; },
             animationManager: game.animationManager,
             cardWidth: 186, //149,
-            cardHeight: 260, //208,
+            cardHeight: 260 //208,
         }) || this;
         _this.game = game;
         return _this;
     }
     CardsManager.prototype.setupFrontDiv = function (card, div, ignoreTooltip) {
         if (ignoreTooltip === void 0) { ignoreTooltip = false; }
-        console.log("setupFrontDiv", card);
         div.dataset.index = "" + card.index;
         var index = card.index;
         var col = (index % 9) - 1;
@@ -2174,57 +2332,73 @@ var CardsManager = /** @class */ (function (_super) {
             }
             // Draw section areas
             if (!div.querySelector(".hero-actions")) {
-                div.insertAdjacentHTML("beforeend", "\n            <div class=\"hero-actions\">\n                <div class=\"nut\" id=\"rondel".concat(rondelChar, "\"></div>\n                <div class=\"hero-action action1\" id=\"").concat(card.typeArg, "-action1\"></div>\n                <div class=\"hero-action action2\" id=\"").concat(card.typeArg, "-action2\"></div>\n                <div class=\"hero-action action3\" id=\"").concat(card.typeArg, "-action3\"></div>\n                <div class=\"hero-action action4\" id=\"").concat(card.typeArg, "-action4\"></div>\n                <div class=\"hero-action action5\" id=\"").concat(card.typeArg, "-action5\"></div>\n                <div class=\"hero-action action6\" id=\"").concat(card.typeArg, "-action6\"></div>\n                <div class=\"hero-action action7\" id=\"").concat(card.typeArg, "-action7\"></div>\n                <div class=\"hero-action action8\" id=\"").concat(card.typeArg, "-action8\"></div>\n            </div>\n            "));
+                div.insertAdjacentHTML("beforeend", "\n            <div class=\"hero-actions\">\n                <div class=\"nut\" id=\"rondel".concat(rondelChar, "\"></div>\n\n                <div class=\"hero-action action-highlight\" \n                     data-pos=\"1\"\n                     id=\"card-").concat(card.typeArg, "-action-highlight-1\"></div>\n\n                <div class=\"hero-action action\" \n                     data-pos=\"1\" \n                     id=\"card-").concat(card.typeArg, "-action-1\"></div>\n\n                <div class=\"hero-action action-highlight\" \n                     data-pos=\"2\" \n                     id=\"card-").concat(card.typeArg, "-action-highlight-2\"></div>\n\n                <div class=\"hero-action action\" \n                     data-pos=\"2\" \n                     id=\"card-").concat(card.typeArg, "-action-2\"></div>\n                \n                     <div class=\"hero-action action-highlight\" data-pos=\"3\" id=\"card-").concat(card.typeArg, "-action-highlight-3\"></div>\n                <div class=\"hero-action action\" data-pos=\"3\" id=\"card-").concat(card.typeArg, "-action-3\"></div>\n\n                <div class=\"hero-action action-highlight\" data-pos=\"4\" id=\"card-").concat(card.typeArg, "-action-highlight-4\"></div>\n                <div class=\"hero-action action\" data-pos=\"4\" id=\"card-").concat(card.typeArg, "-action-4\"></div>\n\n                <div class=\"hero-action action-highlight\" data-pos=\"5\" id=\"card-").concat(card.typeArg, "-action-highlight-5\"></div>\n                <div class=\"hero-action action\" data-pos=\"5\" id=\"card-").concat(card.typeArg, "-action-5\"></div>\n\n                <div class=\"hero-action action-highlight\" data-pos=\"6\" id=\"card-").concat(card.typeArg, "-action-highlight-6\"></div>\n                <div class=\"hero-action action\" data-pos=\"6\" id=\"card-").concat(card.typeArg, "-action-6\"></div>\n\n                <div class=\"hero-action action-highlight\" data-pos=\"7\" id=\"card-").concat(card.typeArg, "-action-highlight-7\"></div>\n                <div class=\"hero-action action\" data-pos=\"7\" id=\"card-").concat(card.typeArg, "-action-7\"></div>\n\n                <div class=\"hero-action action-highlight\" data-pos=\"8\" id=\"card-").concat(card.typeArg, "-action-highlight-8\"></div>\n                <div class=\"hero-action action\" data-pos=\"8\" id=\"card-").concat(card.typeArg, "-action-8\"></div>\n            </div>\n            "));
             }
         }
     };
+    //  <div class="hero-action action1" id="${card.typeArg}-action1"></div>
+    //         <div class="hero-action actionhighlighted1" id="${card.typeArg}-action1"></div>
+    //         <div class="hero-action action2" id="${card.typeArg}-action2"></div>
+    //         <div class="hero-action actionhighlighted2" id="${card.typeArg}-action2"></div>
+    //         <div class="hero-action action3" id="${card.typeArg}-action3"></div>
+    //         <div class="hero-action actionhighlighted3" id="${card.typeArg}-action3"></div>
+    //         <div class="hero-action action4" id="${card.typeArg}-action4"></div>
+    //         <div class="hero-action actionhighlighted4" id="${card.typeArg}-action4"></div>
+    //         <div class="hero-action action5" id="${card.typeArg}-action5"></div>
+    //         <div class="hero-action actionhighlighted5" id="${card.typeArg}-action5"></div>
+    //         <div class="hero-action action6" id="${card.typeArg}-action6"></div>
+    //         <div class="hero-action actionhighlighted6" id="${card.typeArg}-action6"></div>
+    //         <div class="hero-action action7" id="${card.typeArg}-action7"></div>
+    //         <div class="hero-action actionhighlighted7" id="${card.typeArg}-action7"></div>
+    //         <div class="hero-action action8" id="${card.typeArg}-action8"></div>
+    //         <div class="hero-action actionhighlighted8" id="${card.typeArg}-action8"></div>
     CardsManager.prototype.drawGiantActionAreas = function (index, div) {
         var cardAreasById = {
             1: {
                 top: [1, 2, 3],
                 middle: [1, 2, 3],
-                bottom: [500, 701, 702], // listo
+                bottom: [500, 701, 702] // listo
             },
             2: {
                 top: [1, 2, 3],
                 middle: [1, 22, 31],
-                bottom: [111],
+                bottom: [111]
             },
             3: {
                 top: [1, 22, 32],
                 middle: [1, 2, 3],
-                bottom: [300, 301, 302, 303], //listo
+                bottom: [300, 301, 302, 303] //listo
             },
             4: {
                 top: [6],
                 middle: [6, 7, 23, 32],
-                bottom: [111],
+                bottom: [46, 47, 48]
             },
             5: {
                 top: [4, 5],
                 middle: [1, 2, 3],
-                bottom: [500, 501, 502], //LISTO
+                bottom: [500, 501, 502] //LISTO
             },
             6: {
                 top: [1, 21, 31],
-                middle: [5, 71, 61],
-                bottom: [111], //LISTO
+                middle: [64, 65, 66],
+                bottom: [111] //LISTO
             },
             7: {
                 top: [1, 2, 3],
                 middle: [4],
-                bottom: [500, 701, 702], //listo
+                bottom: [500, 701, 702] //listo
             },
             8: {
                 top: [1, 7, 8, 9],
                 middle: [4],
-                bottom: [111],
+                bottom: [111]
             },
             9: {
                 top: [1, 2, 3],
                 middle: [1, 5],
-                bottom: [111],
-            },
+                bottom: [96, 97, 98]
+            }
         };
         // const node = dojo.byId(cardDivId);
         var areas = cardAreasById[index] || [];
@@ -2303,29 +2477,72 @@ var mapTrackId = (_b = {},
     _b["cityDestruction"] = TRACK_ID.CITY_DESTRUCTION,
     _b);
 var TrackManager = /** @class */ (function () {
-    function TrackManager(game) {
+    function TrackManager(trackStateParam, game) {
+        this.trackStateParam = trackStateParam;
+        this.trackState = trackStateParam;
         this.game = game;
-        this.trackState = game.gamedatas.trackState;
     }
     TrackManager.prototype.setupTrack = function () {
-        for (var track in this.trackState) {
-            console.log("track", track, this.trackState[track]);
-            this.printTokenOnBoard(this.getTokenIdForTrack(track), this.getTargetPositionIdForTrack(track));
-        }
+        return __awaiter(this, void 0, void 0, function () {
+            var operations, track;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        operations = [];
+                        for (track in this.trackState) {
+                            operations.push(this.printTokenOnBoard(this.getTokenIdForTrack(track), this.getTargetPositionIdForTrack(track)));
+                        }
+                        return [4 /*yield*/, Promise.all(operations)];
+                    case 1:
+                        _a.sent();
+                        return [2 /*return*/];
+                }
+            });
+        });
     };
     TrackManager.prototype.moveToken = function (track, newPosition) {
-        this.updateTrackValue(track, newPosition);
-        this.printTokenOnBoard(this.getTokenIdForTrack(track), this.getTargetPositionIdForTrack(track));
+        return __awaiter(this, void 0, void 0, function () {
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        this.updateTrackValue(track, newPosition);
+                        return [4 /*yield*/, this.printTokenOnBoard(this.getTokenIdForTrack(track), this.getTargetPositionIdForTrack(track))];
+                    case 1:
+                        _a.sent();
+                        return [2 /*return*/];
+                }
+            });
+        });
     };
     TrackManager.prototype.updateTokens = function (tracks) {
-        for (var track in tracks) {
-            console.log(tracks[track]);
-            console.log(this.trackState[track]);
-            if (tracks[track] !== this.trackState[track]) {
-                console.log('cambio ' + tracks[track]);
-                this.moveToken(track, tracks[track]);
-            }
-        }
+        return __awaiter(this, void 0, void 0, function () {
+            var _a, _b, _c, _i, track;
+            return __generator(this, function (_d) {
+                switch (_d.label) {
+                    case 0:
+                        _a = tracks;
+                        _b = [];
+                        for (_c in _a)
+                            _b.push(_c);
+                        _i = 0;
+                        _d.label = 1;
+                    case 1:
+                        if (!(_i < _b.length)) return [3 /*break*/, 4];
+                        _c = _b[_i];
+                        if (!(_c in _a)) return [3 /*break*/, 3];
+                        track = _c;
+                        if (!(tracks[track] !== this.trackState[track])) return [3 /*break*/, 3];
+                        return [4 /*yield*/, this.moveToken(track, tracks[track])];
+                    case 2:
+                        _d.sent();
+                        _d.label = 3;
+                    case 3:
+                        _i++;
+                        return [3 /*break*/, 1];
+                    case 4: return [2 /*return*/];
+                }
+            });
+        });
     };
     TrackManager.prototype.getTracks = function () {
         return this.trackState;
@@ -2367,7 +2584,6 @@ var TrackManager = /** @class */ (function () {
                         token.style.position = "absolute";
                         token.style.left = "0px";
                         token.style.top = "0px";
-                        console.log(this.game.bgaPlayDojoAnimation);
                         anim = this.game.slideToObject(token.id, target.id);
                         return [4 /*yield*/, this.game.bgaPlayDojoAnimation(anim)];
                     case 1:
@@ -2387,19 +2603,42 @@ var GiantActionActive;
     GiantActionActive["EXCHANGE_RONDEL"] = "exchangeRondel";
     GiantActionActive["MOVE_RONDEL"] = "moveRondel";
 })(GiantActionActive || (GiantActionActive = {}));
+var mapSpecialGiantAction = {
+    1: GiantActionActive.ADVANCE_RONDEL,
+    2: GiantActionActive.EXCHANGE_RONDEL,
+    3: GiantActionActive.MOVE_RONDEL
+};
+function getActionNumber(action) {
+    for (var _i = 0, _a = Object.entries(mapSpecialGiantAction); _i < _a.length; _i++) {
+        var _b = _a[_i], key = _b[0], value = _b[1];
+        if (value === action) {
+            return Number(key);
+        }
+    }
+    return null;
+}
+// mover un rondel adelanmte
+// mover un rondel atras/adelante
+// intercambiar rondel position
+// mover rondel posicion normal
 var HeroeManager = /** @class */ (function () {
-    function HeroeManager(game) {
+    function HeroeManager(game, pHeroeCards, pRondels, pAvailableMovements, pTrackManager) {
         this.game = game;
+        this.currSelectedRondel = null;
         this.handlers = {
             nutHandlers: [],
-            availableMovementsHandlers: [],
+            availableMovementsHandlers: []
         };
-        this.heroes = this.game.gamedatas.heroeCards;
-        this.rondels = this.game.gamedatas.rondels.rondels;
-        this.availableMovements = this.game.gamedatas.rondels.availableMovements;
+        this.heroes = pHeroeCards;
+        this.rondels = pRondels;
+        this.availableMovements = pAvailableMovements;
+        this.trackManager = pTrackManager;
     }
     HeroeManager.prototype.mapRondelCharToIdLocation = function (rondel, location) {
-        return "".concat(rondel.heroe, "-action").concat(location !== null && location !== void 0 ? location : rondel.location);
+        return "card-".concat(rondel.heroe, "-action-").concat(location !== null && location !== void 0 ? location : rondel.location);
+    };
+    HeroeManager.prototype.mapRondelCharToIdLocationHighlight = function (rondel, location) {
+        return "card-".concat(rondel.heroe, "-action-highlight-").concat(location !== null && location !== void 0 ? location : rondel.location);
     };
     HeroeManager.prototype.printRondelOnBoard = function (rondelChar, destId) {
         return __awaiter(this, void 0, void 0, function () {
@@ -2431,37 +2670,337 @@ var HeroeManager = /** @class */ (function () {
             this.printRondelOnBoard(rondelObj.char, rondelPosId);
         }
     };
-    HeroeManager.prototype.resetEnableRondels = function () {
-        for (var rondelKey in this.rondels) {
-            var rondelObj = this.rondels[rondelKey];
-            rondelObj.enabled = true;
-        }
+    HeroeManager.prototype.getNutsFromChars = function (nutChars) {
+        return this.rondels.filter(function (rondel) { return nutChars.includes(rondel.char); });
     };
-    // Add click event to available rondels
-    HeroeManager.prototype.enableRondels = function () {
+    // ---------------------------------------
+    /**
+     * Returns the Rondel object given its character
+     */
+    HeroeManager.prototype.getNutObjByChar = function (rondelChar) {
+        return this.rondels.find(function (rondel) { return rondel.char === rondelChar; });
+    };
+    /**
+     * @param rondelChar
+     * Returns the HTMLElement of the nut given its character
+     * */
+    HeroeManager.prototype.getHTMLNutElemByChar = function (rondelChar) {
+        return document.getElementById("rondel".concat(rondelChar));
+    };
+    /**
+     *
+     * @param nutsChar
+     * Add selectable-nut style
+     */
+    HeroeManager.prototype.setSelectableNut = function (nutsChar) {
         var _this = this;
-        this.removeNutAvailable();
-        console.log("pepito el montonero");
-        var _loop_4 = function (rondelKey) {
-            var rondel = this_1.rondels[rondelKey];
-            console.log(rondel);
-            if (rondel.enabled) {
-                var rondelElem = document.getElementById("rondel".concat(rondel.char));
-                rondelElem.classList.add("available-nut");
-                var handler = dojo.connect(rondelElem, "onclick", function () {
-                    return _this.onNutSelected(rondel);
-                });
-                this_1.handlers.nutHandlers.push(handler);
-            }
+        nutsChar.forEach(function (nutChar) {
+            var _a;
+            (_a = _this.getHTMLNutElemByChar(nutChar)) === null || _a === void 0 ? void 0 : _a.classList.add("selectable-nut");
+        });
+    };
+    /**
+     *
+     * @param nutsChar
+     * Remove selectable-nut style
+     */
+    HeroeManager.prototype.removeSelectableNut = function (nutsChar) {
+        var _this = this;
+        nutsChar.forEach(function (nutChar) {
+            var _a;
+            (_a = _this.getHTMLNutElemByChar(nutChar)) === null || _a === void 0 ? void 0 : _a.classList.remove("selectable-nut");
+        });
+    };
+    /**
+     *
+     * @param nutChars
+     * @param enabled
+     */
+    HeroeManager.prototype.setEnabledNut = function (nutChars, enabled) {
+        this.getNutsFromChars(nutChars).map(function (nut) {
+            nut.enabled = enabled;
+        });
+    };
+    HeroeManager.prototype.addNutClickHandler = function (nutChars) {
+        var _this = this;
+        var _loop_4 = function (nutChar) {
+            var nutHTMLElem = this_1.getHTMLNutElemByChar(nutChar);
+            var handler = dojo.connect(nutHTMLElem, "onclick", function () { return _this.onClickNutEvent(nutChar); });
+            this_1.handlers.nutHandlers.push({ rondel: nutChar, handler: handler });
         };
         var this_1 = this;
-        for (var rondelKey in this.rondels) {
-            _loop_4(rondelKey);
+        for (var _i = 0, nutChars_1 = nutChars; _i < nutChars_1.length; _i++) {
+            var nutChar = nutChars_1[_i];
+            _loop_4(nutChar);
         }
     };
-    HeroeManager.prototype.onNutSelected = function (rondel) {
+    HeroeManager.prototype.removeNutClickHandler = function (nutChars) {
+        var newHandlers = [];
+        this.handlers.nutHandlers.map(function (_a) {
+            var char = _a.rondel, handler = _a.handler;
+            if (nutChars.includes(char)) {
+                dojo.disconnect(handler);
+            }
+            else {
+                newHandlers.push({ rondel: char, handler: handler });
+            }
+        });
+        this.handlers.nutHandlers = newHandlers;
+    };
+    /**
+     * Remove click handlers for available movements
+     */
+    HeroeManager.prototype.removeAvailableMovementsClickHandler = function () {
+        this.handlers.availableMovementsHandlers.map(function (handler) {
+            dojo.disconnect(handler);
+        });
+        this.handlers.availableMovementsHandlers = [];
+    };
+    HeroeManager.prototype.clickOnNut = function () { };
+    /**
+     *
+     * @param specialGiantAction
+     * 1 | 2 | 3
+     */
+    HeroeManager.prototype.initGiantPhase = function (specialGiantAction) {
+        this.giantActionActive = mapSpecialGiantAction[specialGiantAction];
+        this.setEnabledNut(["A", "B", "C"], true);
+        this.setSelectableNut(["A", "B", "C"]);
+        this.addNutClickHandler(["A", "B", "C"]);
+    };
+    HeroeManager.prototype.initHeroPhase = function () {
+        this.giantActionActive = null;
+        this.setEnabledNut(["A", "B", "C"], true);
+        this.setSelectableNut(["A", "B", "C"]);
+        this.addNutClickHandler(["A", "B", "C"]);
+    };
+    // Add click event to available rondels
+    // public enableRondels() {
+    //   console.log("enableRondels called");
+    //   this.removeNutAvailable();
+    //   for (const rondelKey in this.rondels) {
+    //     const rondel = this.rondels[rondelKey];
+    //     console.log("enabled", rondel.enabled);
+    //     if (rondel.enabled) {
+    //       this.setSelectableRondel(rondel);
+    //       // const rondelElem = document.getElementById(`rondel${rondel.char}`);
+    //       // rondelElem.classList.add("available-nut");
+    //       const rondelElem = this.getHTMLNutElemByChar(rondel.char);
+    //       const handler = dojo.connect(rondelElem, "onclick", () => this.setSelectedRondel(rondel));
+    //       this.handlers.nutHandlers.push({ rondel: rondel.char, handler });
+    //     }
+    //   }
+    // }
+    HeroeManager.prototype.unselectNut = function (specialAction) {
+        this.resetAll();
+        this.setSpecialGiantAction(specialAction);
+        this.enableRondels();
+        this.currSelectedRondel = null;
+    };
+    HeroeManager.prototype.getOthersNut = function (rondel) {
+        return Object.values(this.rondels).filter(function (r) { return r.char !== rondel.char; });
+    };
+    HeroeManager.prototype.removeSelectableRondels = function (rondels) {
+        if (!rondels || rondels.length === 0) {
+            // Remove all
+            console.log("Removing all selectable rondels");
+            document.querySelectorAll(".selectable-rondel").forEach(function (el) {
+                el.classList.remove("selectable-rondel");
+            });
+            this.removenutHandlers();
+            this.handlers.nutHandlers = [];
+        }
+        else {
+            // Remove only specified characters
+            var rondelChars = this.rondels.map(function (r) { return r.char; });
+            console.log("Removing specified selectable rondels", rondelChars);
+            rondelChars.forEach(function (char) {
+                var selector = "#rondel".concat(char, ".selectable-rondel");
+                document.querySelectorAll(selector).forEach(function (el) {
+                    el.classList.remove("selectable-rondel");
+                });
+            });
+            this.removenutHandlers();
+        }
+    };
+    HeroeManager.prototype.unselectRondel = function () {
+        console.debug("Unselecting rondel");
+        // Limpiar visuales
+        this.removeHighlighedtActions();
+        document.querySelectorAll(".selected-rondel").forEach(function (el) {
+            el.classList.remove("selected-rondel");
+        });
+        // Volver a hacer selectable todos los rondeles habilitados
+        this.removeSelectableRondels(); // sin parámetro = borra todos
+        for (var rondelKey in this.rondels) {
+            var rondel = this.rondels[rondelKey];
+            if (rondel.enabled) {
+                // this.setSelectableRondel(rondel);
+            }
+        }
+        // Reset estado
         this.resetAvailableMovement();
-        this.enableAvailableMovements(rondel);
+        this.currSelectedRondel = null;
+    };
+    HeroeManager.prototype.setCurrSelectedRondel = function (rondel) {
+        this.currSelectedRondel = rondel;
+    };
+    HeroeManager.prototype.removeCurrSelectedRondel = function () {
+        this.currSelectedRondel = null;
+    };
+    HeroeManager.prototype.setSelectedNut = function (nutChar) {
+        var _a;
+        (_a = this.getHTMLNutElemByChar(nutChar)) === null || _a === void 0 ? void 0 : _a.classList.add("selected-nut");
+    };
+    HeroeManager.prototype.removeSelectedNut = function (nutChar) {
+        var _a;
+        (_a = this.getHTMLNutElemByChar(nutChar)) === null || _a === void 0 ? void 0 : _a.classList.remove("selected-nut");
+    };
+    HeroeManager.prototype.onClickNutEvent = function (nutChar) {
+        var _a, _b, _c, _d, _e, _f, _g;
+        // Check if the clicked nut is already selected
+        if (((_a = this.currSelectedRondel) === null || _a === void 0 ? void 0 : _a.char) === nutChar) {
+            console.log("deseleccion");
+            this.removeSelectableNut([nutChar]);
+            this.removeNutClickHandler([nutChar]);
+            this.removeCurrSelectedRondel();
+            this.setEnabledNut(["A", "B", "C"], true);
+            this.setSelectableNut(["A", "B", "C"]);
+            this.addNutClickHandler(["A", "B", "C"]);
+            // remover "highlighted-action");
+            this.removeHighlighedtActions();
+            this.removeAvailableMovementsClickHandler();
+            this.removeSelectedNut(nutChar);
+            return;
+        }
+        var rondel = this.getHTMLNutElemByChar(nutChar);
+        console.debug("Clicked on rondel: ", rondel);
+        var nut = this.getNutObjByChar(nutChar);
+        var nuts = this.getOthersNut(nut);
+        this.removeSelectableNut(nuts.map(function (n) { return n.char; }));
+        this.removeNutClickHandler(nuts.map(function (n) { return n.char; }));
+        this.setCurrSelectedRondel(nut);
+        this.setSelectedNut(nutChar);
+        this.showAvailableHeroMovements(nut);
+        return;
+        // Si es el mismo que ya estaba seleccionado, cancela la selección
+        if (rondel.char === ((_b = this.currSelectedRondel) === null || _b === void 0 ? void 0 : _b.char)) {
+            this.unselectRondel();
+            return;
+        }
+        // Si hay uno seleccionado, limpiar antes
+        if (this.currSelectedRondel) {
+            this.removeHighlighedtActions();
+            this.resetAvailableMovement();
+        }
+        // Marcar como seleccionado
+        this.currSelectedRondel = rondel;
+        (_c = this.getHTMLNutElemByChar(rondel.char)) === null || _c === void 0 ? void 0 : _c.classList.add("selected-rondel");
+        // Ocultar los otros rondeles
+        var otherChars = this.getOthersNut(rondel).map(function (r) { return r.char; });
+        console.log(otherChars);
+        this.removeSelectableRondels(otherChars);
+        // Evaluar caso
+        this.showAvailableHeroMovements(rondel);
+        return;
+        this.resetAvailableMovement();
+        console.log("onNutSelected", this.giantActionActive);
+        if (((_d = this.currRondelSelected) === null || _d === void 0 ? void 0 : _d.char) == rondel.char) {
+            this.unselectNut(null);
+        }
+        // .nut.selected
+        if (this.giantActionActive === GiantActionActive.EXCHANGE_RONDEL) {
+            console.log(0);
+            if (((_e = this.currRondelSelected) === null || _e === void 0 ? void 0 : _e.char) == rondel.char) {
+                // deshabilito, cancelo seleccion
+                this.unselectNut(2);
+            }
+            else {
+                console.log("enableSwitchMovement", rondel);
+                this.enableSwitchMovement(rondel);
+            }
+        }
+        else if (this.giantActionActive === GiantActionActive.ADVANCE_RONDEL || this.giantActionActive === GiantActionActive.MOVE_RONDEL) {
+            if (((_f = this.currRondelSelected) === null || _f === void 0 ? void 0 : _f.char) == rondel.char) {
+                // deshabilito, cancelo seleccion
+                var currSelect = this.giantActionActive === GiantActionActive.ADVANCE_RONDEL ? 1 : 3;
+                this.unselectNut(currSelect);
+            }
+            else {
+                this.showSpecialMovement(rondel);
+                this.currRondelSelected = rondel;
+            }
+        }
+        else {
+            if (((_g = this.currRondelSelected) === null || _g === void 0 ? void 0 : _g.char) == rondel.char) {
+                this.unselectNut(null);
+            }
+            else {
+                this.showAvailableHeroMovements(rondel);
+                this.currRondelSelected = rondel;
+            }
+        }
+    };
+    HeroeManager.prototype.getValidMovementsByMoral = function () {
+        var qualityMoral = this.trackManager.getTracks().qualityMoral;
+        switch (qualityMoral) {
+            case 5:
+            case 4:
+                return [1, 2, 3, 4, 5, 6, 7, 8];
+            case 3:
+            case 2:
+                return [1, 2, 3, 5, 6, 7];
+            case 1:
+                return [1, 3, 5, 7];
+            default:
+                break;
+        }
+    };
+    HeroeManager.prototype.adjustToValidLocation = function (currentLocation, validLocations) {
+        if (validLocations.includes(currentLocation)) {
+            return currentLocation;
+        }
+        var sorted = __spreadArray([], validLocations, true).sort(function (a, b) { return a - b; });
+        for (var i = sorted.length - 1; i >= 0; i--) {
+            if (sorted[i] < currentLocation) {
+                return sorted[i];
+            }
+        }
+        return sorted[sorted.length - 1];
+    };
+    HeroeManager.prototype.getNextRondelLocation = function (current, movement, morale) {
+        var index = morale.indexOf(current);
+        if (index === -1) {
+            throw new Error("Invalid current location for given morale level");
+        }
+        var newIndex = (index + movement + morale.length) % morale.length;
+        return morale[newIndex];
+    };
+    HeroeManager.prototype.showSpecialMovement = function (rondel) {
+        var _this = this;
+        this.removeHighlighedtActions();
+        var availableMovements;
+        if (this.giantActionActive == GiantActionActive.ADVANCE_RONDEL) {
+            availableMovements = [1];
+        }
+        else if (this.giantActionActive == GiantActionActive.MOVE_RONDEL) {
+            availableMovements = [-1, 1];
+        }
+        else {
+            throw new Error("ACTION INVALIDA");
+        }
+        var validMovements = this.getValidMovementsByMoral();
+        var validLocation = this.adjustToValidLocation(rondel.location, validMovements);
+        availableMovements.map(function (movement) {
+            var rondelNewLocation = _this.getNextRondelLocation(validLocation, movement, validMovements);
+            var elemId = _this.mapRondelCharToIdLocationHighlight(rondel, rondelNewLocation);
+            var elem = document.getElementById(elemId);
+            elem.classList.add("highlighted-action");
+            var handler = dojo.connect(elem, "onclick", function () {
+                _this.onSpecialGiantActionSelected([rondel.char], rondelNewLocation);
+            });
+            _this.handlers.availableMovementsHandlers.push(handler);
+        });
     };
     HeroeManager.prototype.removeHighlighedtActions = function () {
         document.querySelectorAll(".highlighted-action").forEach(function (el) {
@@ -2475,9 +3014,7 @@ var HeroeManager = /** @class */ (function () {
     };
     HeroeManager.prototype.resetAvailableMovement = function () {
         this.removeHighlighedtActions();
-        this.handlers.availableMovementsHandlers.forEach(function (handler) {
-            return handler.remove();
-        });
+        this.handlers.availableMovementsHandlers.forEach(function (handler) { return handler.remove(); });
         this.handlers.availableMovementsHandlers = [];
     };
     HeroeManager.prototype.resetNut = function () {
@@ -2490,63 +3027,50 @@ var HeroeManager = /** @class */ (function () {
         this.resetNut();
         this.giantActionActive = null;
     };
-    HeroeManager.prototype.enableAvailableMovements = function (rondel) {
+    HeroeManager.prototype.enableSwitchMovement = function (rondelClicked) {
+        var _this = this;
+        console.log("enableSwitchMovement", rondelClicked);
+        // this.game.addCancelButton(rondelClicked);
+        this.currRondelSelected = rondelClicked;
+        var _loop_5 = function (rondelKey) {
+            var rondelObj = this_2.rondels[rondelKey];
+            if (rondelObj.char !== rondelClicked.char) {
+                // Ignore rondel clicked
+                var rondelElem = document.getElementById("rondel".concat(rondelObj.char));
+                rondelElem.parentElement.classList.add("highlighted-action");
+                var handler = dojo.connect(rondelElem, "onclick", function () { return _this.onExchangeNutSelected(rondelObj, rondelClicked); });
+                this_2.handlers.nutHandlers.push(handler);
+            }
+        };
+        var this_2 = this;
+        for (var rondelKey in this.rondels) {
+            _loop_5(rondelKey);
+        }
+    };
+    HeroeManager.prototype.showAvailableHeroMovements = function (rondel) {
         var _this = this;
         console.log(rondel, this.availableMovements);
         console.log(this.handlers);
-        this.removeHighlighedtActions();
-        if (this.giantActionActive) {
-            switch (this.giantActionActive) {
-                case GiantActionActive.ADVANCE_RONDEL:
-                    this.availableMovements = [1];
-                    break;
-                case GiantActionActive.EXCHANGE_RONDEL:
-                    var _loop_5 = function (rondelKey) {
-                        var rondelObj = this_2.rondels[rondelKey];
-                        // console.log(rondel);
-                        if (rondelObj.char !== rondel.char) {
-                            var rondelElem = document.getElementById("rondel".concat(rondel.char));
-                            rondelElem.classList.add("available-nut");
-                            var handler = dojo.connect(rondelElem, "onclick", function () {
-                                return _this.onExchangeNutSelected(rondel, rondelObj);
-                            });
-                            this_2.handlers.nutHandlers.push(handler);
-                        }
-                    };
-                    var this_2 = this;
-                    // Add button to cancel action
-                    for (var rondelKey in this.rondels) {
-                        _loop_5(rondelKey);
-                    }
-                    break;
-                case GiantActionActive.MOVE_RONDEL:
-                    this.availableMovements = [-1, 1];
-                    break;
-                default:
-                    break;
-            }
-        }
+        // this.removeHighlighedtActions();
+        var validMovements = this.getValidMovementsByMoral();
+        var validLocation = this.adjustToValidLocation(rondel.location, validMovements);
         this.availableMovements.map(function (movement) {
-            var rondelNewLocation = ((rondel.location + movement - 1) % 8) + 1; // 1 to 8
-            var elemId = _this.mapRondelCharToIdLocation(rondel, rondelNewLocation);
+            var rondelNewLocation = _this.getNextRondelLocation(validLocation, movement, validMovements);
+            var elemId = _this.mapRondelCharToIdLocationHighlight(rondel, rondelNewLocation);
             var elem = document.getElementById(elemId);
             elem.classList.add("highlighted-action");
             var handler = dojo.connect(elem, "onclick", function () {
-                if (_this.giantActionActive) {
-                    _this.onSpecialGiantActionSelected([rondel], movement, rondelNewLocation);
-                }
-                else {
-                    _this.onAvailableMovementSelected(rondel, movement, rondelNewLocation);
-                }
+                _this.onAvailableMovementSelected(rondel, movement, rondelNewLocation);
             });
             _this.handlers.availableMovementsHandlers.push(handler);
         });
     };
     HeroeManager.prototype.onExchangeNutSelected = function (rondelA, rondelB) {
-        this.game.onSpecialGiantActionClick([rondelA, rondelB], 0, 0);
+        console.log(rondelA, rondelB);
+        this.game.onSpecialGiantActionClick([rondelA.char, rondelB.char], null, this.giantActionActive);
     };
-    HeroeManager.prototype.onSpecialGiantActionSelected = function (rondel, movement, rondelNewLocation) {
-        this.game.onSpecialGiantActionClick(rondel, movement, rondelNewLocation);
+    HeroeManager.prototype.onSpecialGiantActionSelected = function (rondel, rondelNewLocation) {
+        this.game.onSpecialGiantActionClick(rondel, rondelNewLocation, this.giantActionActive);
     };
     HeroeManager.prototype.onAvailableMovementSelected = function (rondel, movement, rondelNewLocation) {
         this.game.onHeroeActionCardClick(rondel, movement, rondelNewLocation);
@@ -2569,72 +3093,187 @@ var HeroeManager = /** @class */ (function () {
     };
     return HeroeManager;
 }());
+var GiantAdvanceRondelPosBehavior = /** @class */ (function () {
+    function GiantAdvanceRondelPosBehavior() {
+    }
+    return GiantAdvanceRondelPosBehavior;
+}());
+var GiantExchangeRondelPosBehavior = /** @class */ (function () {
+    function GiantExchangeRondelPosBehavior() {
+    }
+    return GiantExchangeRondelPosBehavior;
+}());
+var GiantMoveRondelPosBehavior = /** @class */ (function () {
+    function GiantMoveRondelPosBehavior() {
+    }
+    return GiantMoveRondelPosBehavior;
+}());
+var HeroNormalMovementBehavior = /** @class */ (function () {
+    function HeroNormalMovementBehavior() {
+    }
+    return HeroNormalMovementBehavior;
+}());
+var mapArea = {
+    top: 0,
+    middle: 1,
+    bottom: 2
+};
+var mapAreaName = function (area) {
+    switch (area) {
+        case 0:
+            return "top";
+        case 1:
+            return "middle";
+        case 2:
+            return "bottom";
+        default:
+            break;
+    }
+};
 var GiantManager = /** @class */ (function () {
-    function GiantManager(game) {
-        this.game = game;
-        this.giantPosition = this.game.gamedatas.giantPosition;
-        this.giantArea = this.game.gamedatas.giantArea;
-        this.giantCards = this.game.gamedatas.giantCards;
+    function GiantManager(pGiantPosition, pGiantArea, pGiantCards, pGame) {
+        this.pGiantPosition = pGiantPosition;
+        this.pGiantArea = pGiantArea;
+        this.pGiantCards = pGiantCards;
+        this.pGame = pGame;
+        this.giantPosition = pGiantPosition;
+        this.giantArea = pGiantArea;
+        this.giantCards = pGiantCards;
         this.handlers = [];
         this.currGiantCard = this.getCurrentGiantCard();
+        this.game = pGame;
     }
-    GiantManager.prototype.updateGiant = function (newPosition, newArea, cards) {
-        this.giantPosition = newPosition;
-        this.giantArea = newArea;
-        this.giantCards = cards;
-        this.currGiantCard = this.getCurrentGiantCard();
-    };
     GiantManager.prototype.getCurrentGiantCard = function () {
         return this.giantCards[this.giantPosition - 1];
+    };
+    GiantManager.prototype.setupGiant = function () {
+        this.placeGiantToken();
+    };
+    GiantManager.prototype.placeGiantToken = function () {
+        var _a;
+        var giantElem = document.querySelector(".giantToken");
+        var currCardElem = null;
+        currCardElem = document.querySelector("#card-".concat(((_a = this.currGiantCard) === null || _a === void 0 ? void 0 : _a.id) || 1000));
+        if (!currCardElem) {
+            console.error("Curr card element not found yet, retrying...");
+            currCardElem = document.querySelector("#card-1000");
+        }
+        var toppx = {
+            top: "18",
+            middle: "102",
+            bottom: "190"
+        };
+        if (giantElem && currCardElem) {
+            // Aseguramos que la carta tenga posición relativa
+            currCardElem.style.position = "relative";
+            // Estilo del token
+            Object.assign(giantElem.style, {
+                position: "absolute",
+                top: "".concat(toppx[mapAreaName(this.giantArea)], "px"), // o ajustalo si querés centrar verticalmente
+                // left: `${currCardElem.offsetWidth - 200}px`, // al costado derecho con 5px de offset
+                left: "-38px",
+                width: "".concat(currCardElem.offsetWidth / 3, "px"),
+                height: "auto", // mantener proporciones
+                zIndex: "11" // aseguramos que esté arriba
+            });
+            // Agregamos el token al DOM si no está ya dentro
+            currCardElem.appendChild(giantElem);
+        }
     };
     GiantManager.prototype.removeHighlighedtActions = function () {
         document.querySelectorAll(".highlighted-action").forEach(function (el) {
             el.classList.remove("highlighted-action");
         });
     };
+    GiantManager.prototype.getMandatoryActionSlot = function () {
+        var activeSection = this.getCurrentSectionActive();
+        return activeSection.mandatory;
+    };
+    GiantManager.prototype.getOptionalActionSlots = function () {
+        var activeSection = this.getCurrentSectionActive();
+        return activeSection.optional;
+    };
+    GiantManager.prototype.highlightGiantActions = function (isMandatoryStage) {
+        var _this = this;
+        var _a;
+        if (isMandatoryStage === void 0) { isMandatoryStage = false; }
+        if (!this.currGiantCard) {
+            throw Error('No current Giant card face up');
+        }
+        var cardId = (_a = this.currGiantCard) === null || _a === void 0 ? void 0 : _a.id;
+        var areaName = mapAreaName(this.giantArea);
+        var elemAreaNodes = document.querySelectorAll("#card-".concat(cardId, "-front .").concat(areaName, " .giant-action-area"));
+        if (!elemAreaNodes || elemAreaNodes.length === 0) {
+            console.warn("highlightGiantActions: no action nodes found", { cardId: cardId, areaName: areaName });
+            return;
+        }
+        if (isMandatoryStage) {
+            var el = elemAreaNodes[0];
+            if (!el) {
+                console.warn("highlightGiantActions: mandatory element missing");
+                return;
+            }
+            el.classList.add("highlighted-action");
+            var handler = dojo.connect(el, "onclick", function () { return _this.onActionSelected(0); });
+            this.handlers.push(handler);
+            // console.log("Connected mandatory action handler");
+        }
+        else {
+            var mandatorySlot = this.getMandatoryActionSlot();
+            var hasMandatorySlot = Boolean(mandatorySlot && Array.isArray(mandatorySlot.actions) && mandatorySlot.actions.length);
+            var _loop_6 = function (index) {
+                var actionIndex = hasMandatorySlot ? index - 1 : index;
+                var el = elemAreaNodes[index];
+                if (!el)
+                    return "continue";
+                el.classList.add("highlighted-action");
+                var handler = dojo.connect(el, "onclick", function () { return _this.onActionSelected(actionIndex); });
+                this_3.handlers.push(handler);
+            };
+            var this_3 = this;
+            for (var index = hasMandatorySlot ? 1 : 0; index < elemAreaNodes.length; index++) {
+                _loop_6(index);
+            }
+            // console.log("Connected optional action handlers");
+        }
+    };
+    // -------
+    GiantManager.prototype.highlightMandatoryAction = function () {
+        this.highlightGiantActions(true);
+    };
+    GiantManager.prototype.highlightOptionalActions = function () {
+        this.highlightGiantActions(false);
+    };
+    GiantManager.prototype.updateGiant = function (newPosition, newArea, cards) {
+        this.giantPosition = newPosition;
+        this.giantArea = newArea;
+        this.giantCards = cards;
+        this.currGiantCard = this.getCurrentGiantCard();
+    };
+    /**
+     * Remove highlight effects & handlers from actions
+     */
     GiantManager.prototype.resetGiantActions = function () {
         this.removeHighlighedtActions();
         this.handlers.forEach(function (handler) { return handler.remove(); });
         this.handlers = [];
     };
     GiantManager.prototype.onActionSelected = function (index) {
+        console.log("Action selected:", index);
         this.game.onGiantTableCardClick(this.currGiantCard.id, this.giantArea, index);
     };
-    GiantManager.prototype.highlightGiantActions = function (isMandatoryStage) {
-        var _this = this;
-        if (isMandatoryStage === void 0) { isMandatoryStage = false; }
-        console.log('highlightGiantActions', isMandatoryStage);
-        console.log(this.currGiantCard);
-        console.log(this.giantArea);
-        var elemAreaNodes = document.querySelectorAll("#card-".concat(this.currGiantCard.id, "-front .").concat(this.giantArea, " .giant-action-area"));
-        console.log('elemAreaNodes', elemAreaNodes);
-        if (isMandatoryStage) {
-            elemAreaNodes[0].classList.add("highlighted-action");
-            var handler = dojo.connect(elemAreaNodes[0], "onclick", function () { return _this.onActionSelected(1); });
-            this.handlers.push(handler);
-        }
-        if (!isMandatoryStage) {
-            var _loop_6 = function (i) {
-                elemAreaNodes[i].classList.add("highlighted-action");
-                var handler = dojo.connect(elemAreaNodes[i], "onclick", function () { return _this.onActionSelected(i); });
-                this_3.handlers.push(handler);
-            };
-            var this_3 = this;
-            for (var i = 1; i < elemAreaNodes.length; i++) {
-                _loop_6(i);
-            }
-        }
+    GiantManager.prototype.getCurrentCard = function () {
+        return this.currGiantCard;
+    };
+    GiantManager.prototype.getCurrentSectionActive = function () {
+        return this.currGiantCard.sections[this.giantArea];
     };
     return GiantManager;
 }());
 var GiantTableCenter = /** @class */ (function () {
-    function GiantTableCenter(game, gamedatas) {
+    function GiantTableCenter(game, pVisibleCards) {
         this.game = game;
-        console.log('GiantTableCenter constructor', gamedatas);
-        var visibleCount = 1;
-        // const visibleCount = gamedatas.visibleCardCount;
-        var visibleCards = gamedatas.giantCards;
-        console.log('cards', visibleCards);
+        var visibleCards = pVisibleCards;
         var totalCards = 9;
         var fakeCards = [];
         visibleCards.forEach(function (card, index) {
@@ -2654,8 +3293,7 @@ var GiantTableCenter = /** @class */ (function () {
             });
         }
         var allCards = __spreadArray(__spreadArray([], visibleCards, true), fakeCards, true);
-        console.log('allCards', allCards);
-        document.getElementById("giant-table-row").insertAdjacentHTML('beforeend', "                \n            <div>\n                <div class=\"name-wrapper\">\n                    <span class=\"name\" style=\"color: #red;\">Giant Path</span>\n                </div>\n                <div id=\"giant-table-cards\" class=\"giant-table-cards\"></div>\n            </div>\n        ");
+        document.getElementById("giant-table-row").insertAdjacentHTML('beforeend', "                \n            <div>\n                <div class=\"name-wrapper\">\n                    <span class=\"name\" style=\"color: #red;\">Giant Path</span>\n                </div>\n                <div id=\"giant-table-cards\" class=\"giant-table-cards\">\n                <div class=\"giantToken\" id=\"giantToken\"></div>\n                </div>\n            </div>\n        ");
         this.giantTableCards = new LineStock(this.game.cardsManager, document.getElementById("giant-table-cards"), {
             center: false,
         });
@@ -2685,10 +3323,9 @@ var GiantTableCenter = /** @class */ (function () {
     return GiantTableCenter;
 }());
 var HeroeTableCenter = /** @class */ (function () {
-    function HeroeTableCenter(game, gamedatas) {
+    function HeroeTableCenter(game, pHeroeCards) {
         this.game = game;
-        console.log("HeroeTableCenter constructor", gamedatas);
-        var heroeCards = gamedatas.heroeCards;
+        var heroeCards = pHeroeCards;
         document.getElementById("heroe-table-row").insertAdjacentHTML("beforeend", "                \n            <div>\n                <div class=\"name-wrapper\">\n                    <span class=\"name\" style=\"color: #red;\">Heroes</span>\n                </div>\n                <div id=\"heroe-table-cards\" class=\"heroe-table-cards\">\n\n                </div>\n            </div>\n        ");
         this.heroeTableCards = new LineStock(this.game.cardsManager, document.getElementById("heroe-table-cards"), {
             center: false,
@@ -2698,11 +3335,105 @@ var HeroeTableCenter = /** @class */ (function () {
     return HeroeTableCenter;
 }());
 var CityTableCenter = /** @class */ (function () {
-    function CityTableCenter(game, gamedatas) {
-        this.game = game;
-        console.log("CityTableCenter constructor", gamedatas);
+    function CityTableCenter() {
         document.getElementById("city-table-row").insertAdjacentHTML("beforeend", "                \n            <div>\n                <div class=\"name-wrapper\">\n                    <span class=\"name\" style=\"color: #red;\">City</span>\n                </div>\n                <div id=\"city-table-cards\" class=\"city-table-cards\">\n                    <div class=\"city-card\" id=\"city-card\">\n                        <div class=\"city-tracks\" id=\"city-tracks\"></div>\n                    </div>\n                </div>\n            </div>\n        ");
         document.getElementById("city-tracks").insertAdjacentHTML("beforeend", "\n                      <div class=\"track-token\" id=\"token-life\"></div>\n                      <div class=\"track-token\" id=\"token-attack\"></div>\n                      <div class=\"track-token\" id=\"token-repair\"></div>\n                      <div class=\"track-token\" id=\"token-moral\"></div>\n                      <div class=\"track-token\" id=\"token-ammo\"></div>\n                      <div class=\"track-token\" id=\"token-tools\"></div>\n                      <div class=\"track-token\" id=\"token-trumpet\"></div>\n                      <div class=\"track-token\" id=\"token-destruction\"></div>\n      \n                      <div class=\"".concat(TRACK.GIANT_LIFE, " life1\" id=\"").concat(TRACK_ID.GIANT_LIFE, "1\"></div>\n                      <div class=\"").concat(TRACK.GIANT_LIFE, " life2\" id=\"").concat(TRACK_ID.GIANT_LIFE, "2\"></div>\n                      <div class=\"").concat(TRACK.GIANT_LIFE, " life3\" id=\"").concat(TRACK_ID.GIANT_LIFE, "3\"></div>\n                      <div class=\"").concat(TRACK.GIANT_LIFE, " life4\" id=\"").concat(TRACK_ID.GIANT_LIFE, "4\"></div>\n                      <div class=\"").concat(TRACK.GIANT_LIFE, " life5\" id=\"").concat(TRACK_ID.GIANT_LIFE, "5\"></div>\n                      <div class=\"").concat(TRACK.GIANT_LIFE, " life6\" id=\"").concat(TRACK_ID.GIANT_LIFE, "6\"></div>\n                      <div class=\"").concat(TRACK.GIANT_LIFE, " life7\" id=\"").concat(TRACK_ID.GIANT_LIFE, "7\"></div>\n                      <div class=\"").concat(TRACK.GIANT_LIFE, " life8\" id=\"").concat(TRACK_ID.GIANT_LIFE, "8\"></div>\n                      <div class=\"").concat(TRACK.GIANT_LIFE, " life9\" id=\"").concat(TRACK_ID.GIANT_LIFE, "9\"></div>\n                      <div class=\"").concat(TRACK.GIANT_LIFE, " life10\" id=\"").concat(TRACK_ID.GIANT_LIFE, "10\"></div>\n      \n                      <div class=\"").concat(TRACK.QUALITY_ATTACK, " attack0\" id=\"").concat(TRACK_ID.QUALITY_ATTACK, "0\"></div>\n                      <div class=\"").concat(TRACK.QUALITY_ATTACK, " attack1\" id=\"").concat(TRACK_ID.QUALITY_ATTACK, "1\"></div>\n                      <div class=\"").concat(TRACK.QUALITY_ATTACK, " attack2\" id=\"").concat(TRACK_ID.QUALITY_ATTACK, "2\"></div>\n                      <div class=\"").concat(TRACK.QUALITY_ATTACK, " attack3\" id=\"").concat(TRACK_ID.QUALITY_ATTACK, "3\"></div>\n                      <div class=\"").concat(TRACK.QUALITY_ATTACK, " attack4\" id=\"").concat(TRACK_ID.QUALITY_ATTACK, "4\"></div>\n                      <div class=\"").concat(TRACK.QUALITY_ATTACK, " attack5\" id=\"").concat(TRACK_ID.QUALITY_ATTACK, "5\"></div>\n      \n                      <div class=\"").concat(TRACK.QUALITY_REPAIR, " repair0\" id=\"").concat(TRACK_ID.QUALITY_REPAIR, "0\"></div>\n                      <div class=\"").concat(TRACK.QUALITY_REPAIR, " repair1\" id=\"").concat(TRACK_ID.QUALITY_REPAIR, "1\"></div>\n                      <div class=\"").concat(TRACK.QUALITY_REPAIR, " repair2\" id=\"").concat(TRACK_ID.QUALITY_REPAIR, "2\"></div>\n                      <div class=\"").concat(TRACK.QUALITY_REPAIR, " repair3\" id=\"").concat(TRACK_ID.QUALITY_REPAIR, "3\"></div>\n                      <div class=\"").concat(TRACK.QUALITY_REPAIR, " repair4\" id=\"").concat(TRACK_ID.QUALITY_REPAIR, "4\"></div>\n                      <div class=\"").concat(TRACK.QUALITY_REPAIR, " repair5\" id=\"").concat(TRACK_ID.QUALITY_REPAIR, "5\"></div>\n      \n                      <div class=\"").concat(TRACK.QUALITY_MORAL, " moral0\" id=\"").concat(TRACK_ID.QUALITY_MORAL, "0\"></div>\n                      <div class=\"").concat(TRACK.QUALITY_MORAL, " moral1\" id=\"").concat(TRACK_ID.QUALITY_MORAL, "1\"></div>\n                      <div class=\"").concat(TRACK.QUALITY_MORAL, " moral2\" id=\"").concat(TRACK_ID.QUALITY_MORAL, "2\"></div>\n                      <div class=\"").concat(TRACK.QUALITY_MORAL, " moral3\" id=\"").concat(TRACK_ID.QUALITY_MORAL, "3\"></div>\n                      <div class=\"").concat(TRACK.QUALITY_MORAL, " moral4\" id=\"").concat(TRACK_ID.QUALITY_MORAL, "4\"></div>\n                      <div class=\"").concat(TRACK.QUALITY_MORAL, " moral5\" id=\"").concat(TRACK_ID.QUALITY_MORAL, "5\"></div>\n      \n                      <div class=\"").concat(TRACK.SUPPLY_AMMO, " ammo0\" id=\"").concat(TRACK_ID.SUPPLY_AMMO, "0\"></div>\n                      <div class=\"").concat(TRACK.SUPPLY_AMMO, " ammo1\" id=\"").concat(TRACK_ID.SUPPLY_AMMO, "1\"></div>\n                      <div class=\"").concat(TRACK.SUPPLY_AMMO, " ammo2\" id=\"").concat(TRACK_ID.SUPPLY_AMMO, "2\"></div>\n                      <div class=\"").concat(TRACK.SUPPLY_AMMO, " ammo3\" id=\"").concat(TRACK_ID.SUPPLY_AMMO, "3\"></div>\n                      <div class=\"").concat(TRACK.SUPPLY_AMMO, " ammo4\" id=\"").concat(TRACK_ID.SUPPLY_AMMO, "4\"></div>\n      \n                      <div class=\"").concat(TRACK.SUPPLY_TOOLS, " tools0\" id=\"").concat(TRACK_ID.SUPPLY_TOOLS, "0\"></div>\n                      <div class=\"").concat(TRACK.SUPPLY_TOOLS, " tools1\" id=\"").concat(TRACK_ID.SUPPLY_TOOLS, "1\"></div>\n                      <div class=\"").concat(TRACK.SUPPLY_TOOLS, " tools2\" id=\"").concat(TRACK_ID.SUPPLY_TOOLS, "2\"></div>\n                      <div class=\"").concat(TRACK.SUPPLY_TOOLS, " tools3\" id=\"").concat(TRACK_ID.SUPPLY_TOOLS, "3\"></div>\n                      <div class=\"").concat(TRACK.SUPPLY_TOOLS, " tools4\" id=\"").concat(TRACK_ID.SUPPLY_TOOLS, "4\"></div>\n      \n                      <div class=\"").concat(TRACK.SUPPLY_TRUMPET, " trumpet0\" id=\"").concat(TRACK_ID.SUPPLY_TRUMPET, "0\"></div>\n                      <div class=\"").concat(TRACK.SUPPLY_TRUMPET, " trumpet1\" id=\"").concat(TRACK_ID.SUPPLY_TRUMPET, "1\"></div>\n                      <div class=\"").concat(TRACK.SUPPLY_TRUMPET, " trumpet2\" id=\"").concat(TRACK_ID.SUPPLY_TRUMPET, "2\"></div>\n                      <div class=\"").concat(TRACK.SUPPLY_TRUMPET, " trumpet3\" id=\"").concat(TRACK_ID.SUPPLY_TRUMPET, "3\"></div>\n                      <div class=\"").concat(TRACK.SUPPLY_TRUMPET, " trumpet4\" id=\"").concat(TRACK_ID.SUPPLY_TRUMPET, "4\"></div>\n      \n                      <div class=\"").concat(TRACK.CITY_DESTRUCTION, " destruction1\" id=\"").concat(TRACK_ID.CITY_DESTRUCTION, "1\"></div>\n                      <div class=\"").concat(TRACK.CITY_DESTRUCTION, " destruction2\" id=\"").concat(TRACK_ID.CITY_DESTRUCTION, "2\"></div>\n                      <div class=\"").concat(TRACK.CITY_DESTRUCTION, " destruction3\" id=\"").concat(TRACK_ID.CITY_DESTRUCTION, "3\"></div>\n                      <div class=\"").concat(TRACK.CITY_DESTRUCTION, " destruction4\" id=\"").concat(TRACK_ID.CITY_DESTRUCTION, "4\"></div>\n                      <div class=\"").concat(TRACK.CITY_DESTRUCTION, " destruction5\" id=\"").concat(TRACK_ID.CITY_DESTRUCTION, "5\"></div>\n                      <div class=\"").concat(TRACK.CITY_DESTRUCTION, " destruction6\" id=\"").concat(TRACK_ID.CITY_DESTRUCTION, "6\"></div>\n                      <div class=\"").concat(TRACK.CITY_DESTRUCTION, " destruction7\" id=\"").concat(TRACK_ID.CITY_DESTRUCTION, "7\"></div>\n                      <div class=\"").concat(TRACK.CITY_DESTRUCTION, " destruction8\" id=\"").concat(TRACK_ID.CITY_DESTRUCTION, "8\"></div>\n                      <div class=\"").concat(TRACK.CITY_DESTRUCTION, " destruction9\" id=\"").concat(TRACK_ID.CITY_DESTRUCTION, "9\"></div>\n                      <div class=\"").concat(TRACK.CITY_DESTRUCTION, " destruction10\" id=\"").concat(TRACK_ID.CITY_DESTRUCTION, "10\"></div>\n              "));
     }
     return CityTableCenter;
 }());
+var SetupHeroTableCenter = /** @class */ (function () {
+    function SetupHeroTableCenter(cardsManager, args) {
+        var _this = this;
+        this.handlers = [];
+        // Use TypeArg as card value
+        this.cardsSelected = {
+            cardA: null,
+            cardB: null,
+            cardC: null
+        };
+        var heroCards = args.heroCards;
+        var sortedHeroCards = sortedCardsByImageLocation(heroCards);
+        document.getElementById("city-table-center").insertAdjacentHTML("beforebegin", "                \n            <div id=\"setup-table-center\">\n              <div id=\"setup-table-row\">\n                <div class=\"name-wrapper\">\n                  <span class=\"name\" style=\"color: #red;\">Select Hero</span>\n                </div>\n                <div id=\"setup-table-cards\" class=\"setup-table-cards\">\n                  <div id=\"cards-a\"></div>\n                  <div id=\"cards-b\"></div>\n                  <div id=\"cards-c\"></div>\n                </div>\n              </div>\n            </div>\n        ");
+        this.heroACards = new LineStock(cardsManager, document.getElementById("cards-a"), {
+            center: true
+        });
+        this.heroBCards = new LineStock(cardsManager, document.getElementById("cards-b"), {
+            center: false
+        });
+        this.heroCCards = new LineStock(cardsManager, document.getElementById("cards-c"), {
+            center: false
+        });
+        this.heroACards.addCards([sortedHeroCards[0], sortedHeroCards[1], sortedHeroCards[2]]);
+        this.heroBCards.addCards([sortedHeroCards[3], sortedHeroCards[4], sortedHeroCards[5]]);
+        this.heroCCards.addCards([sortedHeroCards[6], sortedHeroCards[7], sortedHeroCards[8]]);
+        document.querySelectorAll(".hero-actions").forEach(function (card) {
+            card.remove();
+        });
+        // setup click handler to select / highlight a card and keep one selected per column (A/B/C)
+        document.querySelectorAll("#setup-table-cards .card").forEach(function (cardEl) {
+            var el = cardEl;
+            var handler = dojo.connect(el, "onclick", function () {
+                var cardTypeArg = el.dataset.typeArg;
+                // find which column this card belongs to
+                var parent = el.closest("#cards-a, #cards-b, #cards-c");
+                var key = null;
+                if (parent) {
+                    if (parent.id === "cards-a")
+                        key = "cardA";
+                    else if (parent.id === "cards-b")
+                        key = "cardB";
+                    else if (parent.id === "cards-c")
+                        key = "cardC";
+                }
+                if (!key)
+                    return; // safety
+                var alreadySelected = _this.cardsSelected[key] === cardTypeArg;
+                // remove previous selection in this column
+                parent.querySelectorAll(".card.selected").forEach(function (c) { return c.classList.remove("selected"); });
+                if (!alreadySelected) {
+                    el.classList.add("selected");
+                    _this.cardsSelected[key] = cardTypeArg;
+                }
+                else {
+                    // toggle off if clicked again
+                    _this.cardsSelected[key] = null;
+                }
+            });
+            _this.handlers.push(handler);
+        });
+    }
+    /**
+     * Check if all hero cards are selected
+     */
+    SetupHeroTableCenter.prototype.allCardsSelected = function () {
+        return this.cardsSelected.cardA !== null && this.cardsSelected.cardB !== null && this.cardsSelected.cardC !== null;
+    };
+    /**
+     * Return the selected hero cards (typeArg number)
+     */
+    SetupHeroTableCenter.prototype.getSelectedCards = function () {
+        return __assign({}, this.cardsSelected);
+    };
+    /**
+       * Clean up dojo connections when done
+       */
+    SetupHeroTableCenter.prototype.destroy = function () {
+        var _a;
+        // Disconnect all stored handlers
+        this.handlers.forEach(function (handler) {
+            try {
+                dojo.disconnect(handler);
+            }
+            catch (e) {
+                console.warn('Failed to disconnect handler:', e);
+            }
+        });
+        this.handlers = [];
+        // Optional: remove DOM elements if needed
+        (_a = document.getElementById('setup-table-center')) === null || _a === void 0 ? void 0 : _a.remove();
+    };
+    return SetupHeroTableCenter;
+}());
+var sortedCardsByImageLocation = function (cards) {
+    return cards.slice().sort(function (a, b) { var _a, _b; return ((_a = a.typeArg) !== null && _a !== void 0 ? _a : 0) - ((_b = b.typeArg) !== null && _b !== void 0 ? _b : 0); });
+};

@@ -1,13 +1,8 @@
 class GiantTableCenter {
     private giantTableCards: LineStock<Card>;
 
-    constructor(private game: AmenazaGiganteGame, gamedatas: AmenazaGiganteGamedatas) {
-        console.log('GiantTableCenter constructor', gamedatas);
-
-        const visibleCount = 1;
-        // const visibleCount = gamedatas.visibleCardCount;
-        const visibleCards: GiantCard[]  = gamedatas.giantCards;
-        console.log('cards', visibleCards)
+    constructor(private game: AmenazaGiganteGame, pVisibleCards: GiantCard[]) {
+        const visibleCards: GiantCard[]  = pVisibleCards;
         const totalCards = 9;
         const fakeCards: GiantCard[] = [];
 
@@ -30,13 +25,14 @@ class GiantTableCenter {
         }
 
         const allCards = [...visibleCards, ...fakeCards];
-        console.log('allCards', allCards)
         document.getElementById(`giant-table-row`).insertAdjacentHTML('beforeend', `                
             <div>
                 <div class="name-wrapper">
                     <span class="name" style="color: #red;">Giant Path</span>
                 </div>
-                <div id="giant-table-cards" class="giant-table-cards"></div>
+                <div id="giant-table-cards" class="giant-table-cards">
+                <div class="giantToken" id="giantToken"></div>
+                </div>
             </div>
         `);
 
