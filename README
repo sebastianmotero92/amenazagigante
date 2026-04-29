@@ -400,3 +400,24 @@ tableCards = [
         "gold": 0
     }
 ]
+
+
+src/
+├── components/          # Componentes visuales autónomos
+│   ├── cards/           # Lógica de manos y decks (CardHand.ts, CardStack.ts)
+│   ├── board/           # El tablero central y sus sub-áreas
+│   │   ├── CityTable.ts
+│   │   ├── GiantTable.ts
+│   │   └── HeroTable.ts
+│   ├── shared/          # Tokens, contadores, animaciones comunes
+│   │   ├── Counter.ts
+│   │   └── TokenManager.ts
+├── managers/            # Lógica de "cerebro" (no visual)
+│   ├── AnimationManager.ts  # Centraliza todas las animaciones
+│   ├── TooltipManager.ts    # Centraliza los textos de ayuda
+│   └── SelectionManager.ts  # Maneja qué está clickeado actualmente
+├── states/              # Lógica específica de cada estado del juego
+│   ├── PlayerTurnState.ts
+│   └── GiantMoveState.ts
+├── amenazagigante.ts    # Punto de entrada (solo coordina)
+└── utils.ts             # Funciones puras (cálculos, formateo)

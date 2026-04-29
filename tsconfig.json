@@ -1,8 +1,9 @@
 {
   "rootDir": "",
   "compilerOptions": {
-    "target": "es5",
-    "module": "none",
+    "target": "ESNext",
+    "module": "amd",
+    "moduleResolution": "classic",
     "lib": ["dom", "esnext"],
     "sourceMap": false,
     "typeRoots": ["src/types", "./types", "./node_modules/@types"],
@@ -43,7 +44,8 @@
     "src/giant-table-center.ts",
     "src/heroe-table-center.ts",
     "src/city-table-center.ts",
-    "src/setup-hero-table-center.ts",
+    "src/managers/SetupHeroTableCenter.ts",
+    "src/managers/HeroeManager.ts",
     "src/utils.ts"
   ]
 }

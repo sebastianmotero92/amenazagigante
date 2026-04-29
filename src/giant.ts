@@ -167,7 +167,7 @@ class GiantManager {
 
   public onActionSelected(index) {
     console.log("Action selected:", index);
-    this.game.onGiantTableCardClick(this.currGiantCard.id, this.giantArea, index);
+    // this.game.onGiantTableCardClick(this.currGiantCard.id, this.giantArea, index);
   }
 
   public getCurrentCard(): GiantCard {

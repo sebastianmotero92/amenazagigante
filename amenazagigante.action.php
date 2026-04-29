@@ -21,9 +21,11 @@
  * this.ajaxcall( "/game/game/myAction.html", ...)
  *
  */
-class action_amenazagigante extends APP_GameAction {
+class action_amenazagigante extends APP_GameAction
+{
     // Constructor: please do not modify
-    public function __default() {
+    public function __default()
+    {
         if (self::isArg("notifwindow")) {
             $this->view = "common_notifwindow";
             $this->viewArgs["table"] = self::getArg("table", AT_posint, true);
@@ -34,27 +36,39 @@ class action_amenazagigante extends APP_GameAction {
     }
 
     // Add your action methods here
-    public function actPlayCard() {
+    public function actPlayCard()
+    {
         self::setAjaxMode();
         $card_id = self::getArg('card_id', AT_posint, true);
         $this->game->actPlayCard($card_id);
         self::ajaxResponse();
     }
 
-    public function actPass() {
+    public function actPass()
+    {
         self::setAjaxMode();
         $this->game->actPass();
         self::ajaxResponse();
     }
 
-    public function actSelectHeroes() {
-        self::setAjaxMode();
-        $hero_ids = self::getArg('hero_ids', AT_alphanum, true);
-        $this->game->actSelectHeroes($hero_ids);
-        self::ajaxResponse();
+    public function actSelectHeroes()
+    {
+        $this->setAjaxMode();
+
+        // Recuperamos los 3 argumentos enviados desde el JS
+        // AT_posint valida que sean enteros positivos
+        $cardA = $this->getArg("cardA", AT_posint, true);
+        $cardB = $this->getArg("cardB", AT_posint, true);
+        $cardC = $this->getArg("cardC", AT_posint, true);
+
+        // Llamamos al método en la lógica del juego (game.php)
+        $this->game->actSelectHeroes($cardA, $cardB, $cardC);
+
+        $this->ajaxResponse();
     }
 
-    public function actExecuteMandatoryAction() {
+    public function actExecuteMandatoryAction()
+    {
         self::setAjaxMode();
         $idCard = self::getArg('idCard', AT_posint, true);
         $sector = self::getArg('sector', AT_posint, true);
@@ -63,7 +77,8 @@ class action_amenazagigante extends APP_GameAction {
         self::ajaxResponse();
     }
 
-    public function actExecuteOptionalAction() {
+    public function actExecuteOptionalAction()
+    {
         self::setAjaxMode();
         $idCard = self::getArg('idCard', AT_posint, true);
         $sector = self::getArg('sector', AT_posint, true);
@@ -72,14 +87,16 @@ class action_amenazagigante extends APP_GameAction {
         self::ajaxResponse();
     }
 
-    public function actExecuteSpecialSwitchAction() {
+    public function actExecuteSpecialSwitchAction()
+    {
         self::setAjaxMode();
         $action = self::getArg('action', AT_posint, true);
         $this->game->actExecuteSpecialSwitchAction($action);
         self::ajaxResponse();
     }
 
-    public function actExecuteSpecialMoveAction() {
+    public function actExecuteSpecialMoveAction()
+    {
         self::setAjaxMode();
         $action = self::getArg('action', AT_posint, true);
         $this->game->actExecuteSpecialMoveAction($action);

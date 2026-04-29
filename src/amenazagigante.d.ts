@@ -55,18 +55,15 @@ interface AmenazaGiganteGame extends Game {
     animationManager: AnimationManager;
     cardsManager: CardsManager;
     trackManager: TrackManager;
-    heroeManager: HeroeManager;
+    heroManager: HeroeManager;
     gamedatas: AmenazaGiganteGamedatas;
-
-    onTableCardClick: any;
-    onGiantTableCardClick: any;
-    onHeroeActionCardClick: any
-    onSpecialGiantActionClick: any;
-    addCancelButton: any
-    playSelectedHeroes: any;
 
     slideToObject: any
     bgaPlayDojoAnimation: any
+    
+    // Callback methods
+    onSpecialGiantActionClick(rondel: string[], rondelNewLocation: number | null, giantActionActive: GiantActionActive | null): void;
+    onHeroeActionCardClick(rondel: Rondel, movement: number, rondelNewLocation: number): void;
 }
 
 type StateArgsMap = {
@@ -196,4 +193,49 @@ interface NotifHeroesSelected {
     // rondels: Rondels;
     // giantPosition: TGiantPosition;
     // giantArea: TGiantArea;
+}
+
+// Missing types for HeroeManager
+type GiantActionActive = "advanceRondel" | "exchangeRondel" | "moveRondel";
+
+interface TrackManager {
+    getTracks(): TrackState;
+}
+
+interface HeroeCard {
+    id: number;
+    type: string;
+    type_arg: number;
+    location: string;
+    location_arg: number;
+}
+
+interface GiantCard {
+    id: number;
+    type: string;
+    type_arg: number;
+    location: string;
+    location_arg: number;
+}
+
+interface Card {
+    id: number;
+    type: string;
+    type_arg: number;
+    location: string;
+    location_arg: number;
+}
+
+interface AnimationManager {
+    // Placeholder for animation manager interface
+}
+
+interface CardsManager {
+    // Placeholder for cards manager interface
+}
+
+// Callback methods that game class should implement
+interface GameCallbacks {
+    onSpecialGiantActionClick(rondel: string[], rondelNewLocation: number | null, giantActionActive: GiantActionActive | null): void;
+    onHeroeActionCardClick(rondel: Rondel, movement: number, rondelNewLocation: number): void;
 }
